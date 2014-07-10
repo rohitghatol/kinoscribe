@@ -1,0 +1,474 @@
+<!--
+Copyright (c) 2014 Synerzip. All rights reserved.
+This code may only be used under the Apache 2.0 style license found at http://www.apache.org/licenses/LICENSE-2.0
+Code distributed by Synerzip as part of its showcase apps built on Polymer https://github.com/Synerzip/kinoscribe
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+
+<!--
+Element providing solution to creating prezi like slideshow in browser
+
+##### Example
+
+    <kino-pres>
+        <kino-slide x="100" y="100" z="-100" rotateX="30" rotateY="30" rotateZ="0" scale=3">
+            <kino-layout type="title-content">
+                <kino-title>
+                    Slide 1
+                </kino-title>
+                <kino-content>
+                    <ul>
+                        <li>Point 1</li>
+                        <li>Point 2</li>
+                        <li>Point 3</li>
+                    </ul>
+                </kino-content>
+            </kino-layout>
+        </kino-slide>
+    </kino-pres>
+
+@element kino-pres
+@blurb Element providing solution to creating prezi like slideshow in browser
+@status alpha
+@homepage http://github.com/Synerzip/kinoscribe
+-->
+<polymer-element name="kino-pres" >
+
+    <template>
+
+        <style>
+            :host {
+                display: inline;
+                color: red;
+                position:absolute;
+
+            }
+
+            #preso{
+                position:absolute;
+
+                top: 50%;
+                left: 50%;
+                width:100%;
+                height:100%;
+
+
+                transition: all 500ms ease-in-out 250ms;
+                -webkit-transition: all 500ms ease-in-out 250ms;
+
+                -webkit-transform-origin: 0% 0%;
+                -webkit-transform-style: preserve-3d;
+
+                /*
+                TODO - This property needs to be calculated during next and prev slide transition
+                */
+                -webkit-transform: perspective(1905.7071960297765px) scale(0.5247395833333334);
+
+            }
+
+            #container{
+                position:absolute;
+                transition: all 500ms ease-in-out 250ms;
+                -webkit-transition: all 500ms ease-in-out 250ms;
+
+                -webkit-transform-origin: 0% 0%;
+                -webkit-transform-style: preserve-3d;
+
+            }
+        </style>
+
+        <article id="preso">
+            <section id="container">
+                <content select="kino-slide"></content>
+            </section>
+        </article>
+
+    </template>
+
+    <script>
+
+        Polymer('kino-pres', {
+            /**
+             * Current slide being shown
+             *
+             * @property currentSlide
+             * @type num
+             */
+            currentSlide:0,
+            /**
+             * All the Transition Steps for KinoScribe Presentation
+             *
+             * @property aProp
+             * @type bool
+             */
+            steps: [],
+
+
+            attached:function(){
+                var self=this;
+                var container = this.$.container;
+
+
+                var nodes = container.children[0].getDistributedNodes();
+                for(var index=0;index<nodes.length;index++){
+                    var node = nodes[index];
+                    var step = {};
+                    if(node.attributes.x!=null){
+                        step.x = node.attributes.x.value;
+                    }
+                    if(node.attributes.y!=null){
+                        step.y = node.attributes.y.value;
+                    }
+                    if(node.attributes.z!=null){
+                        step.z = node.attributes.z.value;
+                    }
+                    if(node.attributes.rotateX!=null){
+                        step.rotateX = node.attributes.rotateX.value;
+                    }
+                    if(node.attributes.rotateY!=null){
+                        step.rotateY = node.attributes.rotateY.value;
+                    }
+                    if(node.attributes.rotateZ!=null){
+                        step.rotateZ = node.attributes.rotateZ.value;
+                    }
+                    if(node.attributes.scale!=null){
+                        step.scale = node.attributes.scale.value;;
+                    }
+                    this.steps[index]=step;
+                }
+                this.applyCounterMove(this);
+
+
+                document.addEventListener("keydown",function(event){
+
+                    if(37 === event.keyCode){ //Prev
+                        self.currentSlide = self.prevSlideNum();
+                        self.applyCounterMove(self);
+
+                    }
+                    else if(39 === event.keyCode){//next
+                        self.currentSlide = self.nextSlideNum();
+                        self.applyCounterMove(self);
+                    }
+                },true);
+            }
+            ,
+            prevSlideNum : function(){
+                return this.currentSlide<1?0:(this.currentSlide-1);
+            },
+            nextSlideNum : function(){
+                return this.currentSlide>=(this.steps.length-1)?(this.steps.length-1):(this.currentSlide+1);
+            },
+
+            applyCounterMove:function(self){
+
+                var container = self.$.container;
+                var step = self.steps[self.currentSlide];
+
+                //We now reverse the effect on the parent element based on which slide we want to show
+                var css3DTransform = "";
+                if(step.scale!=null){
+                    css3DTransform=css3DTransform+" scale("+(1/step.scale )+")";
+                }
+                if(step.rotateX!=null){
+                    css3DTransform=css3DTransform+" rotateX("+(step.rotateX  * -1 )+"deg)";
+                }
+                if(step.rotateY!=null){
+                    css3DTransform=css3DTransform+" rotateY("+(step.rotateY * -1 )+"deg)";
+                }
+                if(step.rotateZ!=null){
+                    css3DTransform=css3DTransform+" rotateZ("+(step.rotateZ * -1)+"deg)";
+                }
+
+
+                if(step.x==undefined){
+                    step.x=0;
+                }
+                if(step.y==undefined){
+                    step.y=0;
+                }
+                if(step.z==undefined){
+                    step.z=0;
+                }
+                css3DTransform= css3DTransform+"translate3d("+(step.x*-1)+"px,"+(step.y*-1)+"px,"+(step.z*-1)+"px)";
+
+                container.style.webkitTransform=css3DTransform;
+                container.style.transform=css3DTransform;
+
+
+            }
+
+        });
+
+    </script>
+
+</polymer-element>
+
+
+
+<!--
+Element providing solution to creating slides under kino-pres element
+
+##### Example
+
+    <kino-pres>
+        <kino-slide x="100" y="100" z="-100" rotateX="30" rotateY="30" rotateZ="0" scale=3">
+            <kino-layout type="title-content">
+                <kino-title>
+                    Slide 1
+                </kino-title>
+                <kino-content>
+                    <ul>
+                        <li>Point 1</li>
+                        <li>Point 2</li>
+                        <li>Point 3</li>
+                    </ul>
+                </kino-content>
+            </kino-layout>
+        </kino-slide>
+    </kino-pres>
+
+@element kino-slide
+@blurb Element providing solution to creating slides under kino-pres element
+@status alpha
+@homepage http://github.com/Synerzip/kinoscribe
+-->
+
+<polymer-element name="kino-slide" attributes="x y z rotateX rotateY rotateZ scale active">
+
+    <template>
+
+        <style>
+            :host {
+                display: inline;
+                color: red;
+                position:absolute;
+                width:100%;
+                height:100%;
+            }
+            #slide{
+                position:relative;
+                width:300px;
+                height:300px;
+                border-radius: 4px;
+                border:1px solid red;
+                opacity: 0.2;
+            }
+
+            ::content layout{
+                width:100%;
+                height:100%;
+            }
+        </style>
+
+        <section id="slide">
+            <content></content>
+        </section>
+
+    </template>
+
+    <script>
+
+        Polymer('kino-slide', {
+
+
+            /**
+             * The `x` position of the slide on the 3D Presentation Canvas
+             *
+             * @attribute x
+             * @type num
+             * @default 0
+             */
+            x: 0,
+
+            /**
+             * The `y` position of the slide on the 3D Presentation Canvas
+             *
+             * @attribute y
+             * @type num
+             * @default 0
+             */
+            y: 0,
+
+            /**
+             * The `z` position of the slide on the 3D Presentation Canvas
+             *
+             * @attribute z
+             * @type num
+             * @default 0
+             */
+            z: 0,
+
+            /**
+             * The angle of rotation along 'x' axis of the slide on the 3D Presentation Canvas
+             *
+             * @attribute rotateX
+             * @type num
+             * @default 0
+             */
+            rotateX: 0,
+
+            /**
+             * The angle of rotation along 'y' axis of the slide on the 3D Presentation Canvas
+             *
+             * @attribute rotateY
+             * @type num
+             * @default 0
+             */
+            rotateY: 0,
+
+            /**
+             * The angle of rotation along 'z' axis of the slide on the 3D Presentation Canvas
+             *
+             * @attribute rotateZ
+             * @type num
+             * @default 0
+             */
+            rotateZ: 0,
+
+            /**
+             * The magnification scale of this slide
+             *
+             * @attribute scale
+             * @type num
+             * @default 1
+             */
+            scale: 1,
+
+            /**
+             * Indication of this slide being the Active/Current Slide being shown
+             *
+             * @attribute active
+             * @type bool
+             * @default false
+             */
+            active: false,
+
+
+
+            domReady:function(){
+                var css3DTransform = "";
+
+                if(this.x==undefined){
+                    this.x=0;
+                }
+                if(this.y==undefined){
+                    this.y=0;
+                }
+                if(this.z==undefined){
+                    this.z=0;
+                }
+                css3DTransform= css3DTransform+"translate3d("+this.x+"px,"+this.y+"px,"+this.z+"px)";
+                if(this.rotateX!=null){
+                    css3DTransform=css3DTransform+" rotateX("+this.rotateX+"deg)";
+                }
+                if(this.rotateY!=null){
+                    css3DTransform=css3DTransform+" rotateY("+this.rotateY+"deg)";
+                }
+                if(this.rotateZ!=null){
+                    css3DTransform=css3DTransform+" rotateZ("+this.rotateZ+"deg)";
+                }
+                if(this.scale!=null){
+                    css3DTransform=css3DTransform+" scale("+this.scale+")";
+                }
+
+                this.$.slide.style.webkitTransform=css3DTransform;
+                this.$.slide.style.transform=css3DTransform;
+
+            }
+
+
+
+        });
+
+    </script>
+
+</polymer-element>
+
+
+
+<!--
+Element providing layouts for kinoscribe kino-slide elements
+
+##### Example
+
+<kino-pres>
+<kino-slide x="100" y="100" z="-100" rotateX="30" rotateY="30" rotateZ="0" scale=3">
+    <kino-layout type="title-content">
+        <kino-title>
+            Slide 1
+        </kino-title>
+        <kino-content>
+            <ul>
+                <li>Point 1</li>
+                <li>Point 2</li>
+                <li>Point 3</li>
+            </ul>
+        </kino-content>
+    </kino-layout>
+</kino-slide>
+</kino-pres>
+
+@element kino-layout
+@blurb Element providing layouts for kinoscribe kino-slide elements
+@status alpha
+@homepage http://github.com/Synerzip/kinoscribe
+-->
+
+<polymer-element name="kino-layout" attributes="type">
+
+    <template>
+
+        <style>
+            :host {
+                display:block;
+                height:100%;
+            }
+
+            .Title-Slide{
+                background:yellow;
+                height:100%;
+            }
+
+            .Slide-Content{
+                background:lightblue;
+                height:100%;
+            }
+
+        </style>
+
+        <section id="layout">
+            <content></content>
+        </section>
+
+    </template>
+
+    <script>
+
+        Polymer('kino-layout', {
+
+
+            /**
+             * Layout Type for the given slide. One of "Title-Slide", "Slide-Content",
+             *
+             * @attribute type
+             * @type string
+             * @default "Slide-Content"
+             */
+            type: "Slide-Content",
+
+
+            domReady:function(){
+                this.$.layout.className=this.type;
+            }
+
+
+
+        });
+
+    </script>
+
+</polymer-element>
+
