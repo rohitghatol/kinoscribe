@@ -410,7 +410,7 @@ Element providing layouts for kinoscribe kino-slide elements
 
 <kino-pres>
 <kino-slide x="100" y="100" z="-100" rotateX="30" rotateY="30" rotateZ="0" scale=3">
-    <kino-layout type="title-content">
+    <kino-layout type="Title-Slide">
         <kino-title>
             Slide 1
         </kino-title>
@@ -425,6 +425,18 @@ Element providing layouts for kinoscribe kino-slide elements
 </kino-slide>
 </kino-pres>
 
+<p>
+kino-layout's type can be one of the following
+<ul>
+    <li>Title-Slide</li>
+    <li>Slide-Content</li>
+    <li>Section-Header</li>
+    <li>Blank</li>
+    <li>Title-Only</li>
+    <li>Two-Content</li>
+</ul>
+
+</p>
 @element kino-layout
 @blurb Element providing layouts for kinoscribe kino-slide elements
 @status alpha
@@ -439,6 +451,7 @@ Element providing layouts for kinoscribe kino-slide elements
             :host {
                 display:block;
                 height:100%;
+                position:relative;
             }
 
             .Title-Slide{
@@ -446,15 +459,89 @@ Element providing layouts for kinoscribe kino-slide elements
                 height:100%;
             }
 
+            .Title-Slide #title{
+                position:relative;
+                top:30%;
+                width:80%;
+                border:1px solid red;
+            }
+
+            .Title-Slide #content{
+                position:relative;
+                top:60%;
+                width:60%;
+                border:1px solid red;
+
+            }
+
             .Slide-Content{
                 background:lightblue;
                 height:100%;
+                position:relative;
             }
+
+            .Slide-Content #title{
+                position:relative;
+                top:10%;
+                width:100%;
+                border:1px solid red;
+            }
+
+            .Slide-Content #content{
+                position:relative;
+                top:20%;
+                width:100%;
+                height:80%;
+                border:1px solid red;
+
+            }
+
+            .Blank{
+                background:lightblue;
+                height:100%;
+                position:relative;
+            }
+
+            .Blank #title{
+                display:none;
+            }
+
+            .Blank #content{
+                display:none;
+
+            }
+
+            .Title-Only{
+                background:lightblue;
+                height:100%;
+                position:relative;
+            }
+
+            .Title-Only #title{
+                position:relative;
+                top:10%;
+                width:100%;
+                border:1px solid red;
+            }
+
+            .Title-Only #content{
+                display:none;
+
+            }
+
+
+
 
         </style>
 
         <section id="layout">
-            <content></content>
+            <section id="title">
+                <content select="kino-title"></content>
+            </section>
+            <section id="content">
+                <content select="kino-content"></content>
+            </section>
+
         </section>
 
     </template>
@@ -465,7 +552,8 @@ Element providing layouts for kinoscribe kino-slide elements
 
 
             /**
-             * Layout Type for the given slide. One of "Title-Slide", "Slide-Content",
+             * Layout Type for the given slide.
+             * One of "Title-Slide", "Slide-Content","Section-Header","Blank","Title-Only","Two-Content"
              *
              * @attribute type
              * @type string
@@ -485,4 +573,121 @@ Element providing layouts for kinoscribe kino-slide elements
     </script>
 
 </polymer-element>
+
+
+
+
+<!--
+Element title element for kinoscribe's kino-title
+
+##### Example
+
+<kino-pres>
+<kino-slide x="100" y="100" z="-100" rotateX="30" rotateY="30" rotateZ="0" scale=3">
+    <kino-layout type="title-content">
+        <kino-title>
+            Slide 1
+        </kino-title>
+        <kino-content>
+            <ul>
+                <li>Point 1</li>
+                <li>Point 2</li>
+                <li>Point 3</li>
+            </ul>
+        </kino-content>
+    </kino-layout>
+</kino-slide>
+</kino-pres>
+
+@element kino-layout
+@blurb Element title element for kinoscribe's kino-layout
+@status alpha
+@homepage http://github.com/Synerzip/kinoscribe
+-->
+
+<polymer-element name="kino-title">
+
+    <template>
+
+        <style>
+            :host {
+                display:block;
+                height:100%;
+                width:100%;
+            }
+
+        </style>
+
+        <section>
+            <content></content>
+        </section>
+
+    </template>
+
+    <script>
+
+        Polymer('kino-title', {
+        });
+
+    </script>
+
+</polymer-element>
+
+
+
+<!--
+Element content element for kinoscribe's kino-content
+
+##### Example
+
+<kino-pres>
+<kino-slide x="100" y="100" z="-100" rotateX="30" rotateY="30" rotateZ="0" scale=3">
+    <kino-layout type="title-content">
+        <kino-title>
+            Slide 1
+        </kino-title>
+        <kino-content>
+            <ul>
+                <li>Point 1</li>
+                <li>Point 2</li>
+                <li>Point 3</li>
+            </ul>
+        </kino-content>
+    </kino-layout>
+</kino-slide>
+</kino-pres>
+
+@element kino-content
+@blurb Element content element for kinoscribe's kino-content
+@status alpha
+@homepage http://github.com/Synerzip/kinoscribe
+-->
+
+<polymer-element name="kino-content">
+
+    <template>
+
+        <style>
+            :host {
+                display:block;
+
+            }
+
+        </style>
+
+        <section>
+            <content></content>
+        </section>
+
+    </template>
+
+    <script>
+
+        Polymer('kino-content', {
+        });
+
+    </script>
+
+</polymer-element>
+
 
