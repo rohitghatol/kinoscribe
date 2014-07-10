@@ -43,40 +43,16 @@ Element providing solution to creating prezi like slideshow in browser
                 display: inline;
                 color: red;
                 position:absolute;
+                left:50%;
+                top:50%;
 
             }
 
             #preso{
-                position:absolute;
-
-                top: 50%;
-                left: 50%;
-                width:100%;
-                height:100%;
-
-
-                transition: all 500ms ease-in-out 250ms;
-                -webkit-transition: all 500ms ease-in-out 250ms;
-
-                -webkit-transform-origin: 0% 0%;
-                -webkit-transform-style: preserve-3d;
-
-                /*
-                TODO - This property needs to be calculated during next and prev slide transition
-                */
-                /*
-                -webkit-transform: perspective(1905.7071960297765px) scale(0.5247395833333334);
-                */
 
             }
 
             #container{
-                position:absolute;
-                transition: all 500ms ease-in-out 250ms;
-                -webkit-transition: all 500ms ease-in-out 250ms;
-
-                -webkit-transform-origin: 0% 0%;
-                -webkit-transform-style: preserve-3d;
 
             }
         </style>
@@ -129,28 +105,35 @@ Element providing solution to creating prezi like slideshow in browser
                 nodes[0].active=true;
                 for(var index=0;index<nodes.length;index++){
                     var node = nodes[index];
-                    var step = {};
+                    var step = {
+                        x:0,y:0,z:0,
+                        rotateX:0,rotateY:0,rotateZ:0,
+                        scale:1
+                    };
                     if(node.attributes.x!=null){
-                        step.x = node.attributes.x.value;
+                        step.x = this.number(node.attributes.x.value);
                     }
                     if(node.attributes.y!=null){
-                        step.y = node.attributes.y.value;
+                        step.y = this.number(node.attributes.y.value);
                     }
                     if(node.attributes.z!=null){
-                        step.z = node.attributes.z.value;
+                        step.z = this.number(node.attributes.z.value);
                     }
                     if(node.attributes.rotateZ!=null){
-                        step.rotateZ = node.attributes.rotateZ.value;
+                        step.rotateZ = this.number(node.attributes.rotateZ.value);
                     }
                     if(node.attributes.rotateY!=null){
-                        step.rotateY = node.attributes.rotateY.value;
+                        step.rotateY = this.number(node.attributes.rotateY.value);
                     }
                     if(node.attributes.rotateX!=null){
-                        step.rotateX = node.attributes.rotateX.value;
+                        step.rotateX = this.number(node.attributes.rotateX.value);
                     }
 
                     if(node.attributes.scale!=null){
-                        step.scale = node.attributes.scale.value;;
+                        step.scale = this.number(node.attributes.scale.value,1);
+                    }
+                    else{
+                        step.scale=1;
                     }
                     this.steps[index]=step;
                 }
@@ -170,6 +153,9 @@ Element providing solution to creating prezi like slideshow in browser
                     }
                 },true);
             },
+            number : function (value, defaultValue) {
+                return isNaN(value) ? (defaultValue || 0) : Number(value);
+            },
             currentSlideChanged: function(oldValue, newValue) {
                 console.log("Slide changed from "+oldValue+ " to "+newValue);
                 var nodes = this.getChildNodes();
@@ -186,15 +172,13 @@ Element providing solution to creating prezi like slideshow in browser
             },
 
             applyCounterMove:function(self){
-
+                window.scrollTo(0, 0);
                 var container = self.$.container;
                 var step = self.steps[self.currentSlide];
 
                 //We now reverse the effect on the parent element based on which slide we want to show
                 var css3DTransform = "";
-//              if(step.scale!=null){
-//                  css3DTransform=css3DTransform+" scale("+(1/step.scale )+")";
-//              }
+
                 if(step.rotateZ!=null){
                     css3DTransform=css3DTransform+" rotateZ("+(step.rotateZ * -1)+"deg)";
                 }
@@ -205,8 +189,6 @@ Element providing solution to creating prezi like slideshow in browser
                 if(step.rotateX!=null){
                     css3DTransform=css3DTransform+" rotateX("+(step.rotateX  * -1 )+"deg)";
                 }
-
-
 
 
                 if(step.x==undefined){
@@ -220,28 +202,40 @@ Element providing solution to creating prezi like slideshow in browser
                 }
                 css3DTransform= css3DTransform+"translate3d("+(step.x*-1)+"px,"+(step.y*-1)+"px,"+(step.z*-1)+"px)";
 
-                container.style.webkitTransform=css3DTransform;
+                container.style.postion="absolute";
+                container.style.webkitTransformationOrigin="0% 0%";
+                container.style.transition="all 1000ms ease-in-out 0ms";
+                container.style.webkitTransition="all 1000ms ease-in-out 0ms";
+                container.style.transformStyle="preserve-3d";
+                container.style.webkitTransformStyle="preserve-3d";
                 container.style.transform=css3DTransform;
+                container.style.webkitTransform=css3DTransform;
 
-                var targetScale;
-                if(step.scale==undefined){
-                    targetScale =  this.computeWindowScale(this.config);
-                }
-                else{
-                    targetScale = step.scale * this.computeWindowScale(this.config);
-                }
-
-
+                var targetScale = (1/step.scale) * this.computeWindowScale(this.config);
+                
 
                 var perspectiveValue = this.config.perspective/targetScale;
                 var scaleValue = targetScale;
 
                 rootCSS3DTransform = "perspective("+perspectiveValue+"px) scale("+scaleValue+")";
+                var root = self.$.preso;
 
-                self.$.preso.style.webkitTransform = rootCSS3DTransform;
-                self.$.preso.style.transform = rootCSS3DTransform;
 
-                console.log(rootCSS3DTransform);
+                root.style.postion="absolute";
+                root.style.webkitTransformationOrigin="0% 0%";
+                root.style.transition="all 1000ms ease-in-out 0ms";
+                root.style.webkitTransition="all 1000ms ease-in-out 0ms";
+                root.style.transformStyle="preserve-3d";
+                root.style.webkitTransformStyle="preserve-3d";
+                root.style.top="50%";
+                root.style.left="50%";
+                root.style.width="100%;"
+                root.style.height="100%;"
+                root.style.transform = rootCSS3DTransform;
+                root.style.webkitTransform = rootCSS3DTransform;
+
+
+
 
             },
 
@@ -424,7 +418,9 @@ Element providing solution to creating slides under kino-pres element
 
 
             domReady:function(){
-                var css3DTransform = "";
+
+                var css3DTransform = "translate(-50%, -50%) ";
+                //var css3DTransform = "translate(-50%, -50%) ";
 
                 if(this.x==undefined){
                     this.x=0;
@@ -452,8 +448,17 @@ Element providing solution to creating slides under kino-pres element
                     css3DTransform=css3DTransform+" scale("+this.scale+")";
                 }
 
-                this.$.slide.style.webkitTransform=css3DTransform;
-                this.$.slide.style.transform=css3DTransform;
+
+
+                var slide = this.$.slide;
+                css3DTransform=css3DTransform
+                slide.style.position="absolute";
+                slide.style.webkitTransform=css3DTransform;
+                slide.style.transform=css3DTransform;
+
+                slide.style.webkitTransformStyle="preserve-3d;"
+                slide.style.transformStyle="preserve-3d;"
+
 
             }
 
