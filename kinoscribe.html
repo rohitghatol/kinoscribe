@@ -64,7 +64,9 @@ Element providing solution to creating prezi like slideshow in browser
                 /*
                 TODO - This property needs to be calculated during next and prev slide transition
                 */
+                /*
                 -webkit-transform: perspective(1905.7071960297765px) scale(0.5247395833333334);
+                */
 
             }
 
@@ -104,6 +106,17 @@ Element providing solution to creating prezi like slideshow in browser
              */
             steps: [],
 
+            config: {
+                width: 1024,
+                height: 768,
+                maxScale: 1,
+                minScale: 0,
+
+                perspective: 1000,
+
+                transitionDuration: 1000
+            },
+
             getChildNodes:function(){
                 var container = this.$.container;
                 var nodes = container.children[0].getDistributedNodes();
@@ -126,15 +139,16 @@ Element providing solution to creating prezi like slideshow in browser
                     if(node.attributes.z!=null){
                         step.z = node.attributes.z.value;
                     }
-                    if(node.attributes.rotateX!=null){
-                        step.rotateX = node.attributes.rotateX.value;
+                    if(node.attributes.rotateZ!=null){
+                        step.rotateZ = node.attributes.rotateZ.value;
                     }
                     if(node.attributes.rotateY!=null){
                         step.rotateY = node.attributes.rotateY.value;
                     }
-                    if(node.attributes.rotateZ!=null){
-                        step.rotateZ = node.attributes.rotateZ.value;
+                    if(node.attributes.rotateX!=null){
+                        step.rotateX = node.attributes.rotateX.value;
                     }
+
                     if(node.attributes.scale!=null){
                         step.scale = node.attributes.scale.value;;
                     }
@@ -178,18 +192,21 @@ Element providing solution to creating prezi like slideshow in browser
 
                 //We now reverse the effect on the parent element based on which slide we want to show
                 var css3DTransform = "";
-                if(step.scale!=null){
-                    css3DTransform=css3DTransform+" scale("+(1/step.scale )+")";
-                }
-                if(step.rotateX!=null){
-                    css3DTransform=css3DTransform+" rotateX("+(step.rotateX  * -1 )+"deg)";
+//              if(step.scale!=null){
+//                  css3DTransform=css3DTransform+" scale("+(1/step.scale )+")";
+//              }
+                if(step.rotateZ!=null){
+                    css3DTransform=css3DTransform+" rotateZ("+(step.rotateZ * -1)+"deg)";
                 }
                 if(step.rotateY!=null){
                     css3DTransform=css3DTransform+" rotateY("+(step.rotateY * -1 )+"deg)";
                 }
-                if(step.rotateZ!=null){
-                    css3DTransform=css3DTransform+" rotateZ("+(step.rotateZ * -1)+"deg)";
+
+                if(step.rotateX!=null){
+                    css3DTransform=css3DTransform+" rotateX("+(step.rotateX  * -1 )+"deg)";
                 }
+
+
 
 
                 if(step.x==undefined){
@@ -206,9 +223,43 @@ Element providing solution to creating prezi like slideshow in browser
                 container.style.webkitTransform=css3DTransform;
                 container.style.transform=css3DTransform;
 
+                var targetScale;
+                if(step.scale==undefined){
+                    targetScale =  this.computeWindowScale(this.config);
+                }
+                else{
+                    targetScale = step.scale * this.computeWindowScale(this.config);
+                }
 
+
+
+                var perspectiveValue = this.config.perspective/targetScale;
+                var scaleValue = targetScale;
+
+                rootCSS3DTransform = "perspective("+perspectiveValue+"px) scale("+scaleValue+")";
+
+                self.$.preso.style.webkitTransform = rootCSS3DTransform;
+                self.$.preso.style.transform = rootCSS3DTransform;
+
+                console.log(rootCSS3DTransform);
+
+            },
+
+            computeWindowScale: function ( config ) {
+                var hScale = window.innerHeight / config.height,
+                        wScale = window.innerWidth / config.width,
+                        scale = hScale > wScale ? wScale : hScale;
+
+                if (config.maxScale && scale > config.maxScale) {
+                    scale = config.maxScale;
+                }
+
+                if (config.minScale && scale < config.minScale) {
+                    scale = config.minScale;
+                }
+
+                return scale;
             }
-
         });
 
     </script>
@@ -259,11 +310,21 @@ Element providing solution to creating slides under kino-pres element
             }
             #slide{
                 position:relative;
-                width:300px;
-                height:300px;
-                border-radius: 4px;
-                border:1px solid red;
-                -webkit-transition: all 500ms ease-in-out 250ms;
+
+                display: block;
+                width: 900px;
+                height: 700px;
+                padding: 40px 60px;
+                background-color: white;
+                border: 1px solid rgba(0, 0, 0, .3);
+                border-radius: 10px;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, .1);
+                color: rgb(102, 102, 102);
+                text-shadow: 0 2px 2px rgba(0, 0, 0, .1);
+                font-family: 'Open Sans', Arial, sans-serif;
+                font-size: 30px;
+                line-height: 36px;
+                letter-spacing: -1px;
             }
             .active{
                 opacity:1;
@@ -375,6 +436,7 @@ Element providing solution to creating slides under kino-pres element
                     this.z=0;
                 }
                 css3DTransform= css3DTransform+"translate3d("+this.x+"px,"+this.y+"px,"+this.z+"px)";
+
                 if(this.rotateX!=null){
                     css3DTransform=css3DTransform+" rotateX("+this.rotateX+"deg)";
                 }
@@ -384,6 +446,8 @@ Element providing solution to creating slides under kino-pres element
                 if(this.rotateZ!=null){
                     css3DTransform=css3DTransform+" rotateZ("+this.rotateZ+"deg)";
                 }
+
+
                 if(this.scale!=null){
                     css3DTransform=css3DTransform+" scale("+this.scale+")";
                 }
@@ -463,14 +527,20 @@ kino-layout's type can be one of the following
                 position:relative;
                 top:30%;
                 width:80%;
+                height:15%;
                 border:1px solid red;
+                margin:auto;
+                text-align: center;
             }
 
             .Title-Slide #content{
                 position:relative;
                 top:60%;
                 width:60%;
+                height:15%;
                 border:1px solid red;
+                margin:auto;
+                text-align: center;
 
             }
 
@@ -482,18 +552,23 @@ kino-layout's type can be one of the following
 
             .Slide-Content #title{
                 position:relative;
-                top:10%;
-                width:100%;
+                top:0%;
+                height:15%;
+                width:95%;
                 border:1px solid red;
+                margin:10px;
+                padding: 10px;
+                text-align: center;
             }
 
             .Slide-Content #content{
                 position:relative;
-                top:20%;
-                width:100%;
-                height:80%;
+                top:0%;
+                height:75%;
+                width:95%;
                 border:1px solid red;
-
+                margin:10px;
+                padding: 10px;
             }
 
             .Blank{
@@ -519,9 +594,13 @@ kino-layout's type can be one of the following
 
             .Title-Only #title{
                 position:relative;
-                top:10%;
-                width:100%;
+                top:0%;
+                height:15%;
+                width:95%;
                 border:1px solid red;
+                margin:10px;
+                padding: 10px;
+                text-align: center;
             }
 
             .Title-Only #content{
