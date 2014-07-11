@@ -34,231 +34,227 @@ Element providing solution to creating prezi like slideshow in browser
 @status alpha
 @homepage http://github.com/Synerzip/kinoscribe
 -->
-<polymer-element name="kino-pres" >
+<polymer-element name="kino-pres">
 
-    <template>
+<template>
 
-        <style>
-            :host {
-                display: inline;
-                color: red;
-                position:absolute;
-                left:50%;
-                top:50%;
+    <style>
+        :host {
+            display: inline;
+            color: red;
+            position: absolute;
+            left: 50%;
+            top: 50%;
 
+        }
+
+        #preso {
+
+        }
+
+        #container {
+
+        }
+    </style>
+    <article id="preso">
+        <section id="container">
+            <content select="kino-slide"></content>
+        </section>
+    </article>
+
+</template>
+
+<script>
+
+    Polymer('kino-pres', {
+        /**
+         * Current slide being shown
+         *
+         * @property currentSlide
+         * @type num
+         */
+        currentSlide: 0,
+        /**
+         * All the Transition Steps for KinoScribe Presentation
+         *
+         * @property aProp
+         * @type bool
+         */
+        steps: [],
+
+        config: {
+            width: 1024,
+            height: 768,
+            maxScale: 1,
+            minScale: 0,
+
+            perspective: 1000,
+
+            transitionDuration: 1000
+        },
+
+        getChildNodes: function () {
+            var container = this.$.container;
+            var nodes = container.children[0].getDistributedNodes();
+            return nodes;
+        },
+        attached: function () {
+            var self = this;
+
+            var nodes = this.getChildNodes();
+            nodes[0].active = true;
+            for (var index = 0; index < nodes.length; index++) {
+                var node = nodes[index];
+                var step = {
+                    x: 0, y: 0, z: 0,
+                    rotateX: 0, rotateY: 0, rotateZ: 0,
+                    scale: 1
+                };
+                if (node.attributes.x != null) {
+                    step.x = this.number(node.attributes.x.value);
+                }
+                if (node.attributes.y != null) {
+                    step.y = this.number(node.attributes.y.value);
+                }
+                if (node.attributes.z != null) {
+                    step.z = this.number(node.attributes.z.value);
+                }
+                if (node.attributes.rotateZ != null) {
+                    step.rotateZ = this.number(node.attributes.rotateZ.value);
+                }
+                if (node.attributes.rotateY != null) {
+                    step.rotateY = this.number(node.attributes.rotateY.value);
+                }
+                if (node.attributes.rotateX != null) {
+                    step.rotateX = this.number(node.attributes.rotateX.value);
+                }
+
+                if (node.attributes.scale != null) {
+                    step.scale = this.number(node.attributes.scale.value, 1);
+                }
+                else {
+                    step.scale = 1;
+                }
+                this.steps[index] = step;
+            }
+            this.applyCounterMove(this);
+
+
+            document.addEventListener("keydown", function (event) {
+
+                if (37 === event.keyCode) { //Prev
+                    self.currentSlide = self.prevSlideNum();
+                    self.applyCounterMove(self);
+
+                }
+                else if (39 === event.keyCode) {//next
+                    self.currentSlide = self.nextSlideNum();
+                    self.applyCounterMove(self);
+                }
+            }, true);
+        },
+        number: function (value, defaultValue) {
+            return isNaN(value) ? (defaultValue || 0) : Number(value);
+        },
+        currentSlideChanged: function (oldValue, newValue) {
+            var nodes = this.getChildNodes();
+            nodes[oldValue].active = false;
+            nodes[newValue].active = true;
+
+        },
+        prevSlideNum: function () {
+            return this.currentSlide < 1 ? 0 : (this.currentSlide - 1);
+        },
+        nextSlideNum: function () {
+            return this.currentSlide >= (this.steps.length - 1) ? (this.steps.length - 1) : (this.currentSlide + 1);
+        },
+
+        applyCounterMove: function (self) {
+            window.scrollTo(0, 0);
+            var container = self.$.container;
+            var step = self.steps[self.currentSlide];
+
+            //We now reverse the effect on the parent element based on which slide we want to show
+            var css3DTransform = "";
+
+            if (step.rotateZ != null) {
+                css3DTransform = css3DTransform + " rotateZ(" + (step.rotateZ * -1) + "deg)";
+            }
+            if (step.rotateY != null) {
+                css3DTransform = css3DTransform + " rotateY(" + (step.rotateY * -1 ) + "deg)";
             }
 
-            #preso{
-
+            if (step.rotateX != null) {
+                css3DTransform = css3DTransform + " rotateX(" + (step.rotateX * -1 ) + "deg)";
             }
 
-            #container{
 
+            if (step.x == undefined) {
+                step.x = 0;
             }
-        </style>
-        <article id="preso">
-            <section id="container">
-                <content select="kino-slide"></content>
-            </section>
-        </article>
-
-    </template>
-
-    <script>
-
-        Polymer('kino-pres', {
-            /**
-             * Current slide being shown
-             *
-             * @property currentSlide
-             * @type num
-             */
-            currentSlide:0,
-            /**
-             * All the Transition Steps for KinoScribe Presentation
-             *
-             * @property aProp
-             * @type bool
-             */
-            steps: [],
-
-            config: {
-                width: 1024,
-                height: 768,
-                maxScale: 1,
-                minScale: 0,
-
-                perspective: 1000,
-
-                transitionDuration: 1000
-            },
-
-            getChildNodes:function(){
-                var container = this.$.container;
-                var nodes = container.children[0].getDistributedNodes();
-                return nodes;
-            },
-            attached:function(){
-                var self=this;
-
-                var nodes = this.getChildNodes();
-                nodes[0].active=true;
-                for(var index=0;index<nodes.length;index++){
-                    var node = nodes[index];
-                    var step = {
-                        x:0,y:0,z:0,
-                        rotateX:0,rotateY:0,rotateZ:0,
-                        scale:1
-                    };
-                    if(node.attributes.x!=null){
-                        step.x = this.number(node.attributes.x.value);
-                    }
-                    if(node.attributes.y!=null){
-                        step.y = this.number(node.attributes.y.value);
-                    }
-                    if(node.attributes.z!=null){
-                        step.z = this.number(node.attributes.z.value);
-                    }
-                    if(node.attributes.rotateZ!=null){
-                        step.rotateZ = this.number(node.attributes.rotateZ.value);
-                    }
-                    if(node.attributes.rotateY!=null){
-                        step.rotateY = this.number(node.attributes.rotateY.value);
-                    }
-                    if(node.attributes.rotateX!=null){
-                        step.rotateX = this.number(node.attributes.rotateX.value);
-                    }
-
-                    if(node.attributes.scale!=null){
-                        step.scale = this.number(node.attributes.scale.value,1);
-                    }
-                    else{
-                        step.scale=1;
-                    }
-                    this.steps[index]=step;
-                }
-                this.applyCounterMove(this);
-
-
-                document.addEventListener("keydown",function(event){
-
-                    if(37 === event.keyCode){ //Prev
-                        self.currentSlide = self.prevSlideNum();
-                        self.applyCounterMove(self);
-
-                    }
-                    else if(39 === event.keyCode){//next
-                        self.currentSlide = self.nextSlideNum();
-                        self.applyCounterMove(self);
-                    }
-                },true);
-            },
-            number : function (value, defaultValue) {
-                return isNaN(value) ? (defaultValue || 0) : Number(value);
-            },
-            currentSlideChanged: function(oldValue, newValue) {
-                var nodes = this.getChildNodes();
-                nodes[oldValue].active=false;
-                nodes[newValue].active=true;
-
+            if (step.y == undefined) {
+                step.y = 0;
             }
-            ,
-            prevSlideNum : function(){
-                return this.currentSlide<1?0:(this.currentSlide-1);
-            },
-            nextSlideNum : function(){
-                return this.currentSlide>=(this.steps.length-1)?(this.steps.length-1):(this.currentSlide+1);
-            },
-
-            applyCounterMove:function(self){
-                window.scrollTo(0, 0);
-                var container = self.$.container;
-                var step = self.steps[self.currentSlide];
-
-                //We now reverse the effect on the parent element based on which slide we want to show
-                var css3DTransform = "";
-
-                if(step.rotateZ!=null){
-                    css3DTransform=css3DTransform+" rotateZ("+(step.rotateZ * -1)+"deg)";
-                }
-                if(step.rotateY!=null){
-                    css3DTransform=css3DTransform+" rotateY("+(step.rotateY * -1 )+"deg)";
-                }
-
-                if(step.rotateX!=null){
-                    css3DTransform=css3DTransform+" rotateX("+(step.rotateX  * -1 )+"deg)";
-                }
-
-
-                if(step.x==undefined){
-                    step.x=0;
-                }
-                if(step.y==undefined){
-                    step.y=0;
-                }
-                if(step.z==undefined){
-                    step.z=0;
-                }
-                css3DTransform= css3DTransform+"translate3d("+(step.x*-1)+"px,"+(step.y*-1)+"px,"+(step.z*-1)+"px)";
-
-                container.style.postion="absolute";
-                container.style.webkitTransformationOrigin="0% 0%";
-                container.style.transition="all 1000ms ease-in-out 0ms";
-                container.style.webkitTransition="all 1000ms ease-in-out 0ms";
-                container.style.transformStyle="preserve-3d";
-                container.style.webkitTransformStyle="preserve-3d";
-                container.style.transform=css3DTransform;
-                container.style.webkitTransform=css3DTransform;
-
-                var targetScale = (1/step.scale) * this.computeWindowScale(this.config);
-                
-
-                var perspectiveValue = this.config.perspective/targetScale;
-                var scaleValue = targetScale;
-
-                rootCSS3DTransform = "perspective("+perspectiveValue+"px) scale("+scaleValue+")";
-                var root = self.$.preso;
-
-
-                root.style.postion="absolute";
-                root.style.webkitTransformationOrigin="0% 0%";
-                root.style.transition="all 1000ms ease-in-out 0ms";
-                root.style.webkitTransition="all 1000ms ease-in-out 0ms";
-                root.style.transformStyle="preserve-3d";
-                root.style.webkitTransformStyle="preserve-3d";
-                root.style.top="50%";
-                root.style.left="50%";
-                root.style.width="100%;"
-                root.style.height="100%;"
-                root.style.transform = rootCSS3DTransform;
-                root.style.webkitTransform = rootCSS3DTransform;
-
-
-
-
-            },
-
-            computeWindowScale: function ( config ) {
-                var hScale = window.innerHeight / config.height,
-                        wScale = window.innerWidth / config.width,
-                        scale = hScale > wScale ? wScale : hScale;
-
-                if (config.maxScale && scale > config.maxScale) {
-                    scale = config.maxScale;
-                }
-
-                if (config.minScale && scale < config.minScale) {
-                    scale = config.minScale;
-                }
-
-                return scale;
+            if (step.z == undefined) {
+                step.z = 0;
             }
-        });
+            css3DTransform = css3DTransform + "translate3d(" + (step.x * -1) + "px," + (step.y * -1) + "px," + (step.z * -1) + "px)";
 
-    </script>
+            container.style.postion = "absolute";
+            container.style.webkitTransformationOrigin = "0% 0%";
+            container.style.transition = "all 1000ms ease-in-out 0ms";
+            container.style.webkitTransition = "all 1000ms ease-in-out 0ms";
+            container.style.transformStyle = "preserve-3d";
+            container.style.webkitTransformStyle = "preserve-3d";
+            container.style.transform = css3DTransform;
+            container.style.webkitTransform = css3DTransform;
+
+            var targetScale = (1 / step.scale) * this.computeWindowScale(this.config);
+
+
+            var perspectiveValue = this.config.perspective / targetScale;
+            var scaleValue = targetScale;
+
+            rootCSS3DTransform = "perspective(" + perspectiveValue + "px) scale(" + scaleValue + ")";
+            var root = self.$.preso;
+
+
+            root.style.postion = "absolute";
+            root.style.webkitTransformationOrigin = "0% 0%";
+            root.style.transition = "all 1000ms ease-in-out 0ms";
+            root.style.webkitTransition = "all 1000ms ease-in-out 0ms";
+            root.style.transformStyle = "preserve-3d";
+            root.style.webkitTransformStyle = "preserve-3d";
+            root.style.top = "50%";
+            root.style.left = "50%";
+            root.style.width = "100%;"
+            root.style.height = "100%;"
+            root.style.transform = rootCSS3DTransform;
+            root.style.webkitTransform = rootCSS3DTransform;
+
+
+        },
+
+        computeWindowScale: function (config) {
+            var hScale = window.innerHeight / config.height,
+                    wScale = window.innerWidth / config.width,
+                    scale = hScale > wScale ? wScale : hScale;
+
+            if (config.maxScale && scale > config.maxScale) {
+                scale = config.maxScale;
+            }
+
+            if (config.minScale && scale < config.minScale) {
+                scale = config.minScale;
+            }
+
+            return scale;
+        }
+    });
+
+</script>
 
 </polymer-element>
-
 
 
 <!--
@@ -297,12 +293,13 @@ Element providing solution to creating slides under kino-pres element
             :host {
                 display: inline;
                 color: red;
-                position:absolute;
-                width:100%;
-                height:100%;
+                position: absolute;
+                width: 100%;
+                height: 100%;
             }
-            #slide{
-                position:relative;
+
+            #slide {
+                position: relative;
 
                 display: block;
                 width: 900px;
@@ -319,15 +316,18 @@ Element providing solution to creating slides under kino-pres element
                 line-height: 36px;
                 letter-spacing: -1px;
             }
-            .active{
-                opacity:1;
+
+            .active {
+                opacity: 1;
             }
-            .inactive{
-                opacity:0.2;
+
+            .inactive {
+                opacity: 0.2;
             }
-            ::content layout{
-                width:100%;
-                height:100%;
+
+            ::content layout {
+                width: 100%;
+                height: 100%;
             }
         </style>
 
@@ -415,48 +415,46 @@ Element providing solution to creating slides under kino-pres element
             active: false,
 
 
-
-            domReady:function(){
+            domReady: function () {
 
                 var css3DTransform = "translate(-50%, -50%) ";
                 //var css3DTransform = "translate(-50%, -50%) ";
 
-                if(this.x==undefined){
-                    this.x=0;
+                if (this.x == undefined) {
+                    this.x = 0;
                 }
-                if(this.y==undefined){
-                    this.y=0;
+                if (this.y == undefined) {
+                    this.y = 0;
                 }
-                if(this.z==undefined){
-                    this.z=0;
+                if (this.z == undefined) {
+                    this.z = 0;
                 }
-                css3DTransform= css3DTransform+"translate3d("+this.x+"px,"+this.y+"px,"+this.z+"px)";
+                css3DTransform = css3DTransform + "translate3d(" + this.x + "px," + this.y + "px," + this.z + "px)";
 
-                if(this.rotateX!=null){
-                    css3DTransform=css3DTransform+" rotateX("+this.rotateX+"deg)";
+                if (this.rotateX != null) {
+                    css3DTransform = css3DTransform + " rotateX(" + this.rotateX + "deg)";
                 }
-                if(this.rotateY!=null){
-                    css3DTransform=css3DTransform+" rotateY("+this.rotateY+"deg)";
+                if (this.rotateY != null) {
+                    css3DTransform = css3DTransform + " rotateY(" + this.rotateY + "deg)";
                 }
-                if(this.rotateZ!=null){
-                    css3DTransform=css3DTransform+" rotateZ("+this.rotateZ+"deg)";
-                }
-
-
-                if(this.scale!=null){
-                    css3DTransform=css3DTransform+" scale("+this.scale+")";
+                if (this.rotateZ != null) {
+                    css3DTransform = css3DTransform + " rotateZ(" + this.rotateZ + "deg)";
                 }
 
+
+                if (this.scale != null) {
+                    css3DTransform = css3DTransform + " scale(" + this.scale + ")";
+                }
 
 
                 var slide = this.$.slide;
-                css3DTransform=css3DTransform
-                slide.style.position="absolute";
-                slide.style.webkitTransform=css3DTransform;
-                slide.style.transform=css3DTransform;
+                css3DTransform = css3DTransform
+                slide.style.position = "absolute";
+                slide.style.webkitTransform = css3DTransform;
+                slide.style.transform = css3DTransform;
 
-                slide.style.webkitTransformStyle="preserve-3d;"
-                slide.style.transformStyle="preserve-3d;"
+                slide.style.webkitTransformStyle = "preserve-3d;"
+                slide.style.transformStyle = "preserve-3d;"
 
 
             }
@@ -468,7 +466,6 @@ Element providing solution to creating slides under kino-pres element
     </script>
 
 </polymer-element>
-
 
 
 <!--
@@ -517,102 +514,100 @@ kino-layout's type can be one of the following
 
         <style>
             :host {
-                display:block;
-                height:100%;
-                position:relative;
+                display: block;
+                height: 100%;
+                position: relative;
             }
 
-            .Title-Slide{
-                background:yellow;
-                height:100%;
+            .Title-Slide {
+                background: yellow;
+                height: 100%;
             }
 
-            .Title-Slide #title{
-                position:relative;
-                top:30%;
-                width:80%;
-                height:15%;
-                border:1px solid red;
-                margin:auto;
+            .Title-Slide #title {
+                position: relative;
+                top: 30%;
+                width: 80%;
+                height: 15%;
+                border: 1px solid red;
+                margin: auto;
                 text-align: center;
             }
 
-            .Title-Slide #content{
-                position:relative;
-                top:60%;
-                width:60%;
-                height:15%;
-                border:1px solid red;
-                margin:auto;
+            .Title-Slide #content {
+                position: relative;
+                top: 60%;
+                width: 60%;
+                height: 15%;
+                border: 1px solid red;
+                margin: auto;
                 text-align: center;
 
             }
 
-            .Slide-Content{
-                background:lightblue;
-                height:100%;
-                position:relative;
+            .Slide-Content {
+                background: lightblue;
+                height: 100%;
+                position: relative;
             }
 
-            .Slide-Content #title{
-                position:relative;
-                top:0%;
-                height:15%;
-                width:95%;
-                border:1px solid red;
-                margin:10px;
+            .Slide-Content #title {
+                position: relative;
+                top: 0%;
+                height: 15%;
+                width: 95%;
+                border: 1px solid red;
+                margin: 10px;
                 padding: 10px;
                 text-align: center;
             }
 
-            .Slide-Content #content{
-                position:relative;
-                top:0%;
-                height:75%;
-                width:95%;
-                border:1px solid red;
-                margin:10px;
+            .Slide-Content #content {
+                position: relative;
+                top: 0%;
+                height: 75%;
+                width: 95%;
+                border: 1px solid red;
+                margin: 10px;
                 padding: 10px;
             }
 
-            .Blank{
-                background:lightblue;
-                height:100%;
-                position:relative;
+            .Blank {
+                background: lightblue;
+                height: 100%;
+                position: relative;
             }
 
-            .Blank #title{
-                display:none;
+            .Blank #title {
+                display: none;
             }
 
-            .Blank #content{
-                display:none;
+            .Blank #content {
+                display: none;
 
             }
 
-            .Title-Only{
-                background:lightblue;
-                height:100%;
-                position:relative;
+            .Title-Only {
+                background: lightblue;
+                height: 100%;
+                position: relative;
             }
 
-            .Title-Only #title{
-                position:relative;
-                top:0%;
-                height:15%;
-                width:95%;
-                border:1px solid red;
-                margin:10px;
+            .Title-Only #title {
+                position: relative;
+                top: 0%;
+                height: 15%;
+                width: 95%;
+                border: 1px solid red;
+                margin: 10px;
                 padding: 10px;
                 text-align: center;
             }
 
-            .Title-Only #content{
-                display:none;
+            .Title-Only #content {
+                display: none;
 
             }
-
-
 
 
         </style>
@@ -645,8 +640,8 @@ kino-layout's type can be one of the following
             type: "Slide-Content",
 
 
-            domReady:function(){
-                this.$.layout.className=this.type;
+            domReady: function () {
+                this.$.layout.className = this.type;
             }
 
 
@@ -656,8 +651,6 @@ kino-layout's type can be one of the following
     </script>
 
 </polymer-element>
-
-
 
 
 <!--
@@ -694,9 +687,9 @@ Element title element for kinoscribe's kino-title
 
         <style>
             :host {
-                display:block;
-                height:100%;
-                width:100%;
+                display: block;
+                height: 100%;
+                width: 100%;
             }
 
         </style>
@@ -715,7 +708,6 @@ Element title element for kinoscribe's kino-title
     </script>
 
 </polymer-element>
-
 
 
 <!--
@@ -752,7 +744,7 @@ Element content element for kinoscribe's kino-content
 
         <style>
             :host {
-                display:block;
+                display: block;
 
             }
 
@@ -774,13 +766,15 @@ Element content element for kinoscribe's kino-content
 </polymer-element>
 
 
-<polymer-element name="kino-shape" attributes="type left top width height zIndex strokeColor fillColor fillOpacity strokeOpacity">
+<polymer-element name="kino-shape"
+                 attributes="type left top width height zIndex strokeColor fillColor fillOpacity strokeOpacity">
     <template>
         <style>
-            :host{
+            :host {
 
             }
-            #shape{
+
+            #shape {
 
             }
         </style>
@@ -788,11 +782,11 @@ Element content element for kinoscribe's kino-content
             <content></content>
         </div>
     </template>
-    <script src="kino-shapes.js"></script>
-    <script src="GuideFormulaEvaluator.js"></script>
+    <script src="preset-shapes.js"></script>
+    <script src="guide-formula-evaluator.js"></script>
     <script>
 
-        Polymer('kino-shape',{
+        Polymer('kino-shape', {
             /**
              * Type of Shape
              *
@@ -800,7 +794,7 @@ Element content element for kinoscribe's kino-content
              * @type string
              * @default "heart"
              */
-            type:"heart",
+            type: "heart",
             /**
              * X Co ordinate of the Shape
              *
@@ -808,7 +802,7 @@ Element content element for kinoscribe's kino-content
              * @type number
              * @default 100
              */
-            left:100,
+            left: 100,
             /**
              * Y Co ordinate of the Shape
              *
@@ -816,7 +810,7 @@ Element content element for kinoscribe's kino-content
              * @type number
              * @default 100
              */
-            top:100,
+            top: 100,
             /**
              * Width of the Shape
              *
@@ -824,7 +818,7 @@ Element content element for kinoscribe's kino-content
              * @type number
              * @default 100
              */
-            width:100,
+            width: 100,
             /**
              * Height of the Shape
              *
@@ -832,7 +826,7 @@ Element content element for kinoscribe's kino-content
              * @type number
              * @default 100
              */
-            height:100,
+            height: 100,
             /**
              * zIndex of the Shape
              *
@@ -840,7 +834,7 @@ Element content element for kinoscribe's kino-content
              * @type number
              * @default 100
              */
-            zIndex:100,
+            zIndex: 100,
             /**
              * Stroke Color for the Shape
              *
@@ -848,7 +842,7 @@ Element content element for kinoscribe's kino-content
              * @type string
              * @default "black"
              */
-            strokeColor:"black",
+            strokeColor: "black",
             /**
              * Fill Color for the Shape
              *
@@ -856,7 +850,7 @@ Element content element for kinoscribe's kino-content
              * @type string
              * @default "blue"
              */
-            fillColor:"blue",
+            fillColor: "blue",
 
             /**
              * Stroke Opacity for the Shape
@@ -865,7 +859,7 @@ Element content element for kinoscribe's kino-content
              * @type num
              * @default 1.0
              */
-            strokeOpacity:1.0,
+            strokeOpacity: 1.0,
             /**
              * Fill Opacity for the Shape
              *
@@ -873,80 +867,108 @@ Element content element for kinoscribe's kino-content
              * @type num
              * @default 1.0
              */
-            fillOpacity:1.0,
+            fillOpacity: 1.0,
 
 
-            attached:function(){
+            attached: function () {
+
+                var presetShapes = new PresetShapes();
+                var shapeInfo = presetShapes.getShapeInfo(this.type);
+
+
                 var map = {
-                    l:0,
-                    t:0,
-                    h:this.height,
-                    w:this.width
+                    l: 0,
+                    t: 0,
+                    h: this.height,
+                    w: this.width
                 };
 
                 var evaluator = new GuideFormulaEvaluator();
 
-                var gds = shapes[this.type].gdLst.gd;
-                for(var index=0;index<gds.length;index++){
+                var avs = shapeInfo.avLst;
+                if(avs!=null){
+                    for (var index = 0; index < avs.length; index++) {
+                        var gd = avs[index];
+                        var val = evaluator.evaluate(gd.fmla, map);
+                        map[gd.name] = val;
+                    }
+                }
+
+                var gds = shapeInfo.gdLst;
+                for (var index = 0; index < gds.length; index++) {
                     var gd = gds[index];
-                    var val = evaluator.evaluate(gd["-fmla"],map);
-                    map[gd["-name"]]=val;
+                    var val = evaluator.evaluate(gd.fmla, map);
+                    map[gd.name] = val;
                 }
 
 
+                var svgPaths = "";
+                for (var pindex = 0; pindex < shapeInfo.pathLst.length; pindex++) {
 
-                var path = shapes[this.type].pathLst.path;
-
-                var svgPath = "<path d=\"";
-                for(index=0;index<path.length;index++){
-                    console.log("-- "+index);
-                    var command = path[index];
-
-
-                    if(command.command=="moveTo"){
-                        var point = command.pt;
-                        var x,y;
-
-                        var x = map[point["-x"]]!=null?map[point["-x"]]:evaluator.builtinGuides[point["-x"]](map);
-                        var y = map[point["-y"]]!=null?map[point["-x"]]:evaluator.builtinGuides[point["-y"]](map);
+                    var pathChild = shapeInfo.pathLst[pindex];
+                    var path =pathChild.path;
+                    svgPaths += "<path d=\"";
+                    for (var index = 0; index < path.length; index++) {
+                        console.log("-- " + index);
+                        var command = path[index];
 
 
-                        svgPath = svgPath+" \n M \n\t"+x+","+y +"\n";
-                    }
-                    else if (command.command == "cubicBezTo"){
-                        svgPath = svgPath+" C ";
-                        var points =command.pt;
+                        if (command.command == "moveTo") {
+                            var point = command.pts[0];
+                            var x, y;
+
+                            var x = map[point.x] != null ? map[point.x] : evaluator.builtinGuides[point.x](map);
+                            var y = map[point.y] != null ? map[point.x] : evaluator.builtinGuides[point.y](map);
 
 
-                        for(var pindex=0;pindex<points.length;pindex++){
-                            console.log("  -- "+pindex);
-                            console.log("calcuating x,y for cubicBez");
-                            var point = points[pindex];
-                            var x = map[point["-x"]]!=null?map[point["-x"]]:evaluator.builtinGuides[point["-x"]](map);
-                            var y = map[point["-y"]]!=null?map[point["-y"]]:evaluator.builtinGuides[point["-y"]](map);
-                            svgPath = svgPath + "\n\t "+ x+","+y;
+                            svgPaths = svgPaths + " \n M \n\t" + x + "," + y + "\n";
+                        }
+                        else if (command.command == "lnTo") {
+                            var point = command.pts[0];
+                            var x, y;
+
+                            var x = map[point.x] != null ? map[point.x] : evaluator.builtinGuides[point.x](map);
+                            var y = map[point.y] != null ? map[point.x] : evaluator.builtinGuides[point.y](map);
+
+
+                            svgPaths = svgPaths + " \n L \n\t" + x + "," + y + "\n";
+                        }
+                        else if (command.command == "cubicBezTo") {
+                            svgPaths = svgPaths + " C ";
+                            var points = command.pts;
+
+
+                            for (var cindex = 0; cindex < points.length; cindex++) {
+                                console.log("  -- " + pindex);
+                                console.log("calcuating x,y for cubicBez");
+                                var point = points[cindex];
+                                var x = map[point.x] != null ? map[point.x] : evaluator.builtinGuides[point.x](map);
+                                var y = map[point.y] != null ? map[point.y] : evaluator.builtinGuides[point.y](map);
+                                svgPaths = svgPaths + "\n\t " + x + "," + y;
+                            }
+
+                            svgPaths = svgPaths + "\n";
+
                         }
 
-                        svgPath=svgPath+"\n";
-
                     }
-
+                    svgPaths += "\"";
+                    svgPaths += " stroke=\"" + this.strokeColor + "\" fill=\"" + this.fillColor + "\" fill-opacity=\"" + this.fillOpacity + "\" stroke-opacity=\"" + this.strokeOpacity + "\"";
+                    svgPaths += " />";
                 }
-                svgPath+= "\"";
-                svgPath+= " stroke=\""+this.strokeColor+"\" fill=\""+this.fillColor+"\" fill-opacity=\""+this.fillOpacity+"\" stroke-opacity=\""+this.strokeOpacity+"\"";
-                svgPath+= " />";
-                var svg = "<svg>"+svgPath+"</svg>";
+                console.log(svgPaths);
+                var svg = "<svg>" + svgPaths + "</svg>";
 
                 var shape = this.$.shape;
-                shape.style.position="absolute";
-                shape.style.left=this.left+"px";
-                shape.style.top=this.top+"px";
-                shape.style.width=this.width+"px";
-                shape.style.height=this.height+"px";
-                shape.style.zIndex=this.zIndex;
+                shape.style.position = "absolute";
+                shape.style.left = this.left + "px";
+                shape.style.top = this.top + "px";
+                shape.style.width = this.width + "px";
+                shape.style.height = this.height + "px";
+                shape.style.zIndex = this.zIndex;
 
 
-                shape.innerHTML=svg;
+                shape.innerHTML = svg;
 
             }
         });
