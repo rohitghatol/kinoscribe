@@ -157,7 +157,6 @@ Element providing solution to creating prezi like slideshow in browser
                 return isNaN(value) ? (defaultValue || 0) : Number(value);
             },
             currentSlideChanged: function(oldValue, newValue) {
-                console.log("Slide changed from "+oldValue+ " to "+newValue);
                 var nodes = this.getChildNodes();
                 nodes[oldValue].active=false;
                 nodes[newValue].active=true;
@@ -774,4 +773,184 @@ Element content element for kinoscribe's kino-content
 
 </polymer-element>
 
+
+<polymer-element name="kino-shape" attributes="type left top width height zIndex strokeColor fillColor fillOpacity strokeOpacity">
+    <template>
+        <style>
+            :host{
+
+            }
+            #shape{
+
+            }
+        </style>
+        <div id="shape">
+            <content></content>
+        </div>
+    </template>
+    <script src="kino-shapes.js"></script>
+    <script src="GuideFormulaEvaluator.js"></script>
+    <script>
+
+        Polymer('kino-shape',{
+            /**
+             * Type of Shape
+             *
+             * @attribute type
+             * @type string
+             * @default "heart"
+             */
+            type:"heart",
+            /**
+             * X Co ordinate of the Shape
+             *
+             * @attribute left
+             * @type number
+             * @default 100
+             */
+            left:100,
+            /**
+             * Y Co ordinate of the Shape
+             *
+             * @attribute top
+             * @type number
+             * @default 100
+             */
+            top:100,
+            /**
+             * Width of the Shape
+             *
+             * @attribute width
+             * @type number
+             * @default 100
+             */
+            width:100,
+            /**
+             * Height of the Shape
+             *
+             * @attribute height
+             * @type number
+             * @default 100
+             */
+            height:100,
+            /**
+             * zIndex of the Shape
+             *
+             * @attribute zIndex
+             * @type number
+             * @default 100
+             */
+            zIndex:100,
+            /**
+             * Stroke Color for the Shape
+             *
+             * @attribute strokeColor
+             * @type string
+             * @default "black"
+             */
+            strokeColor:"black",
+            /**
+             * Fill Color for the Shape
+             *
+             * @attribute fillColor
+             * @type string
+             * @default "blue"
+             */
+            fillColor:"blue",
+
+            /**
+             * Stroke Opacity for the Shape
+             *
+             * @attribute strokeOpacity
+             * @type num
+             * @default 1.0
+             */
+            strokeOpacity:1.0,
+            /**
+             * Fill Opacity for the Shape
+             *
+             * @attribute fillOpacity
+             * @type num
+             * @default 1.0
+             */
+            fillOpacity:1.0,
+
+
+            attached:function(){
+                var map = {
+                    l:0,
+                    t:0,
+                    h:this.height,
+                    w:this.width
+                };
+
+                var evaluator = new GuideFormulaEvaluator();
+
+                var gds = shapes[this.type].gdLst.gd;
+                for(var index=0;index<gds.length;index++){
+                    var gd = gds[index];
+                    var val = evaluator.evaluate(gd["-fmla"],map);
+                    map[gd["-name"]]=val;
+                }
+
+
+
+                var path = shapes[this.type].pathLst.path;
+
+                var svgPath = "<path d=\"";
+                for(index=0;index<path.length;index++){
+                    console.log("-- "+index);
+                    var command = path[index];
+
+
+                    if(command.command=="moveTo"){
+                        var point = command.pt;
+                        var x,y;
+
+                        var x = map[point["-x"]]!=null?map[point["-x"]]:evaluator.builtinGuides[point["-x"]](map);
+                        var y = map[point["-y"]]!=null?map[point["-x"]]:evaluator.builtinGuides[point["-y"]](map);
+
+
+                        svgPath = svgPath+" \n M \n\t"+x+","+y +"\n";
+                    }
+                    else if (command.command == "cubicBezTo"){
+                        svgPath = svgPath+" C ";
+                        var points =command.pt;
+
+
+                        for(var pindex=0;pindex<points.length;pindex++){
+                            console.log("  -- "+pindex);
+                            console.log("calcuating x,y for cubicBez");
+                            var point = points[pindex];
+                            var x = map[point["-x"]]!=null?map[point["-x"]]:evaluator.builtinGuides[point["-x"]](map);
+                            var y = map[point["-y"]]!=null?map[point["-y"]]:evaluator.builtinGuides[point["-y"]](map);
+                            svgPath = svgPath + "\n\t "+ x+","+y;
+                        }
+
+                        svgPath=svgPath+"\n";
+
+                    }
+
+                }
+                svgPath+= "\"";
+                svgPath+= " stroke=\""+this.strokeColor+"\" fill=\""+this.fillColor+"\" fill-opacity=\""+this.fillOpacity+"\" stroke-opacity=\""+this.strokeOpacity+"\"";
+                svgPath+= " />";
+                var svg = "<svg>"+svgPath+"</svg>";
+
+                var shape = this.$.shape;
+                shape.style.position="absolute";
+                shape.style.left=this.left+"px";
+                shape.style.top=this.top+"px";
+                shape.style.width=this.width+"px";
+                shape.style.height=this.height+"px";
+                shape.style.zIndex=this.zIndex;
+
+
+                shape.innerHTML=svg;
+
+            }
+        });
+    </script>
+
+</polymer-element>
 
