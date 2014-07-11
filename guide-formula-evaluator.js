@@ -179,6 +179,9 @@ function GuideFormulaEvaluator() {
         },
         "ss8":function(map){
             return Math.min(map.w, map.h)/8;
+        },
+        "e":function(map){
+            return map.w;
         }
 
 

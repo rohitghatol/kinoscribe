@@ -84,6 +84,14 @@ PresetShapes.prototype.getShapeInfo = function(shapeName){
 
 
         },
+        "arcTo":function(arcToNode,path){
+            path.command="arcTo";
+            path.wR=arcToNode.getAttribute("wR");
+            path.hR=arcToNode.getAttribute("hR");
+            path.stAng=arcToNode.getAttribute("stAng");
+            path.swAng=arcToNode.getAttribute("swAng");
+
+         },
         "cubicBezTo":function(cubicBezToNode,path){
             path.command="cubicBezTo";
             path.pts=[];

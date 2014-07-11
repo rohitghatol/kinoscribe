@@ -918,7 +918,7 @@ Element content element for kinoscribe's kino-content
                             var x, y;
 
                             var x = map[point.x] != null ? map[point.x] : evaluator.builtinGuides[point.x](map);
-                            var y = map[point.y] != null ? map[point.x] : evaluator.builtinGuides[point.y](map);
+                            var y = map[point.y] != null ? map[point.y] : evaluator.builtinGuides[point.y](map);
 
 
                             svgPaths = svgPaths + " \n M \n\t" + x + "," + y + "\n";
@@ -928,7 +928,7 @@ Element content element for kinoscribe's kino-content
                             var x, y;
 
                             var x = map[point.x] != null ? map[point.x] : evaluator.builtinGuides[point.x](map);
-                            var y = map[point.y] != null ? map[point.x] : evaluator.builtinGuides[point.y](map);
+                            var y = map[point.y] != null ? map[point.y] : evaluator.builtinGuides[point.y](map);
 
 
                             svgPaths = svgPaths + " \n L \n\t" + x + "," + y + "\n";
