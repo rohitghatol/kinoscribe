@@ -5,6 +5,10 @@ KinoScribe
 
 KinoScribe is Web Components for doing Prezi like Presentation. 
 
+Authors
+=========
+ * Rohit Ghatol - @rohitghatol
+ * Nikhil Walvekar - @walvekarnikhil
 
 Project Setup
 ==============
