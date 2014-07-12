@@ -14,20 +14,18 @@ Element providing solution to creating prezi like slideshow in browser
 
     <kino-pres>
         <kino-slide x="100" y="100" z="-100" rotateX="30" rotateY="30" rotateZ="0" scale=3">
-            <kino-layout type="title-content">
-                <kino-title>
-                    Slide 1
-                </kino-title>
-                <kino-content>
-                    <ul>
-                        <li>Point 1</li>
-                        <li>Point 2</li>
-                        <li>Point 3</li>
-                    </ul>
-                </kino-content>
-            </kino-layout>
+            <section>
+               Slide 1
+             </section>
         </kino-slide>
+        <kino-slide x="200" y="200" z="-200" rotateX="60" rotateY="60" rotateZ="50" scale=5">
+             <section>
+               Slide 2
+             </section>
+        </kino-slide>
+        ....
     </kino-pres>
+
 
 @element kino-pres
 @blurb Element providing solution to creating prezi like slideshow in browser
@@ -235,26 +233,24 @@ Element providing solution to creating prezi like slideshow in browser
 
 
 <!--
-Element providing solution to creating slides under kino-pres element
+Element providing solution to creating slides under kino-pres web component
 
 ##### Example
 
     <kino-pres>
         <kino-slide x="100" y="100" z="-100" rotateX="30" rotateY="30" rotateZ="0" scale=3">
-            <kino-layout type="title-content">
-                <kino-title>
-                    Slide 1
-                </kino-title>
-                <kino-content>
-                    <ul>
-                        <li>Point 1</li>
-                        <li>Point 2</li>
-                        <li>Point 3</li>
-                    </ul>
-                </kino-content>
-            </kino-layout>
+            <section>
+               Slide 1
+             </section>
         </kino-slide>
+        <kino-slide x="200" y="200" z="-200" rotateX="60" rotateY="60" rotateZ="50" scale=5">
+             <section>
+               Slide 2
+             </section>
+        </kino-slide>
+        ....
     </kino-pres>
+
 
 @element kino-slide
 @blurb Element providing solution to creating slides under kino-pres element
