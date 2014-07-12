@@ -40,20 +40,11 @@ Element providing solution to creating prezi like slideshow in browser
 
     <style>
         :host {
-            display: inline;
-            color: red;
+        }
+        #preso{
             position: absolute;
             left: 50%;
             top: 50%;
-
-        }
-
-        #preso {
-
-        }
-
-        #container {
-
         }
     </style>
     <article id="preso">
@@ -82,25 +73,24 @@ Element providing solution to creating prezi like slideshow in browser
          */
         steps: [],
 
+        /**
+         *
+         */
         config: {
             width: 1024,
             height: 768,
             maxScale: 1,
             minScale: 0,
-
             perspective: 1000,
-
             transitionDuration: 1000
         },
 
-        getChildNodes: function () {
-            var container = this.$.container;
-            var nodes = container.children[0].getDistributedNodes();
-            return nodes;
-        },
+
+        /**
+         *
+         */
         attached: function () {
             var self = this;
-
             var nodes = this.getChildNodes();
             nodes[0].active = true;
             for (var index = 0; index < nodes.length; index++) {
@@ -111,26 +101,26 @@ Element providing solution to creating prezi like slideshow in browser
                     scale: 1
                 };
                 if (node.attributes.x != null) {
-                    step.x = this.number(node.attributes.x.value);
+                    step.x = toNumber(node.attributes.x.value);
                 }
                 if (node.attributes.y != null) {
-                    step.y = this.number(node.attributes.y.value);
+                    step.y = toNumber(node.attributes.y.value);
                 }
                 if (node.attributes.z != null) {
-                    step.z = this.number(node.attributes.z.value);
+                    step.z = toNumber(node.attributes.z.value);
                 }
                 if (node.attributes.rotateZ != null) {
-                    step.rotateZ = this.number(node.attributes.rotateZ.value);
+                    step.rotateZ = toNumber(node.attributes.rotateZ.value);
                 }
                 if (node.attributes.rotateY != null) {
-                    step.rotateY = this.number(node.attributes.rotateY.value);
+                    step.rotateY = toNumber(node.attributes.rotateY.value);
                 }
                 if (node.attributes.rotateX != null) {
-                    step.rotateX = this.number(node.attributes.rotateX.value);
+                    step.rotateX = toNumber(node.attributes.rotateX.value);
                 }
 
                 if (node.attributes.scale != null) {
-                    step.scale = this.number(node.attributes.scale.value, 1);
+                    step.scale = toNumber(node.attributes.scale.value, 1);
                 }
                 else {
                     step.scale = 1;
@@ -153,9 +143,7 @@ Element providing solution to creating prezi like slideshow in browser
                 }
             }, true);
         },
-        number: function (value, defaultValue) {
-            return isNaN(value) ? (defaultValue || 0) : Number(value);
-        },
+
         currentSlideChanged: function (oldValue, newValue) {
             var nodes = this.getChildNodes();
             nodes[oldValue].active = false;
@@ -170,72 +158,55 @@ Element providing solution to creating prezi like slideshow in browser
         },
 
         applyCounterMove: function (self) {
+
+
+
             window.scrollTo(0, 0);
-            var container = self.$.container;
+            var css = new Style();
             var step = self.steps[self.currentSlide];
 
-            //We now reverse the effect on the parent element based on which slide we want to show
-            var css3DTransform = "";
 
-            if (step.rotateZ != null) {
-                css3DTransform = css3DTransform + " rotateZ(" + (step.rotateZ * -1) + "deg)";
-            }
-            if (step.rotateY != null) {
-                css3DTransform = css3DTransform + " rotateY(" + (step.rotateY * -1 ) + "deg)";
-            }
-
-            if (step.rotateX != null) {
-                css3DTransform = css3DTransform + " rotateX(" + (step.rotateX * -1 ) + "deg)";
-            }
-
-
-            if (step.x == undefined) {
-                step.x = 0;
-            }
-            if (step.y == undefined) {
-                step.y = 0;
-            }
-            if (step.z == undefined) {
-                step.z = 0;
-            }
-            css3DTransform = css3DTransform + "translate3d(" + (step.x * -1) + "px," + (step.y * -1) + "px," + (step.z * -1) + "px)";
-
-            container.style.postion = "absolute";
-            container.style.webkitTransformationOrigin = "0% 0%";
-            container.style.transition = "all 1000ms ease-in-out 0ms";
-            container.style.webkitTransition = "all 1000ms ease-in-out 0ms";
-            container.style.transformStyle = "preserve-3d";
-            container.style.webkitTransformStyle = "preserve-3d";
-            container.style.transform = css3DTransform;
-            container.style.webkitTransform = css3DTransform;
-
-            var targetScale = (1 / step.scale) * this.computeWindowScale(this.config);
-
-
+            var root = self.$.preso;
+            var targetScale = inverse(step.scale) * this.windowScale(this.config);
             var perspectiveValue = this.config.perspective / targetScale;
             var scaleValue = targetScale;
 
-            rootCSS3DTransform = "perspective(" + perspectiveValue + "px) scale(" + scaleValue + ")";
-            var root = self.$.preso;
+            var transformBuilder = new TransformBuilder();
+            var transform = transformBuilder
+                    .perspective(perspectiveValue)
+                    .scale(scaleValue)
+                    .transform;
 
+            var style={
+                position:"absolute",
+                webkitTransformationOrigin : "0% 0%",
+                transition:"all 1000ms ease-in-out 0ms",
+                top:"50%",
+                left:"50%",
+                transformStyle:"preserve-3d",
+                transform:transform
+            }
+            css.apply(root,style);
 
-            root.style.postion = "absolute";
-            root.style.webkitTransformationOrigin = "0% 0%";
-            root.style.transition = "all 1000ms ease-in-out 0ms";
-            root.style.webkitTransition = "all 1000ms ease-in-out 0ms";
-            root.style.transformStyle = "preserve-3d";
-            root.style.webkitTransformStyle = "preserve-3d";
-            root.style.top = "50%";
-            root.style.left = "50%";
-            root.style.width = "100%;"
-            root.style.height = "100%;"
-            root.style.transform = rootCSS3DTransform;
-            root.style.webkitTransform = rootCSS3DTransform;
+            var container = self.$.container;
 
+            var transformBuilder = new TransformBuilder();
+            var transform = transformBuilder
+                    .rotate3d(negate(step.rotateX),negate(step.rotateY),negate(step.rotateZ),true)
+                    .translate3d(negate(step.x),negate(step.y),negate(step.z))
+                    .transform
+            var style={
+                position:"absolute",
+                webkitTransformationOrigin : "0% 0%",
+                transition:"all 1000ms ease-in-out 0ms",
+                transformStyle:"preserve-3d",
+                transform:transform
+            }
+            css.apply(container,style);
 
         },
 
-        computeWindowScale: function (config) {
+        windowScale: function (config) {
             var hScale = window.innerHeight / config.height,
                     wScale = window.innerWidth / config.width,
                     scale = hScale > wScale ? wScale : hScale;
@@ -249,6 +220,12 @@ Element providing solution to creating prezi like slideshow in browser
             }
 
             return scale;
+        },
+
+        getChildNodes: function () {
+            var container = this.$.container;
+            var nodes = container.children[0].getDistributedNodes();
+            return nodes;
         }
     });
 
@@ -291,30 +268,10 @@ Element providing solution to creating slides under kino-pres element
 
         <style>
             :host {
-                display: inline;
-                color: red;
-                position: absolute;
-                width: 100%;
-                height: 100%;
             }
 
             #slide {
                 position: relative;
-
-                display: block;
-                width: 900px;
-                height: 700px;
-                padding: 40px 60px;
-                background-color: white;
-                border: 1px solid rgba(0, 0, 0, .3);
-                border-radius: 10px;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, .1);
-                color: rgb(102, 102, 102);
-                text-shadow: 0 2px 2px rgba(0, 0, 0, .1);
-                font-family: 'Open Sans', Arial, sans-serif;
-                font-size: 30px;
-                line-height: 36px;
-                letter-spacing: -1px;
             }
 
             .active {
@@ -336,8 +293,9 @@ Element providing solution to creating slides under kino-pres element
         </section>
 
     </template>
-
+    <script src="style.js"></script>
     <script>
+
 
         Polymer('kino-slide', {
 
@@ -417,45 +375,22 @@ Element providing solution to creating slides under kino-pres element
 
             domReady: function () {
 
-                var css3DTransform = "translate(-50%, -50%) ";
-                //var css3DTransform = "translate(-50%, -50%) ";
+                var elem = this.$.slide;
 
-                if (this.x == undefined) {
-                    this.x = 0;
+                var css = new Style();
+                var transformBuilder = new TransformBuilder();
+
+                var style={
+                    position:"absolute",
+                    transformStyle:"preserve-3d",
+                    transform:transformBuilder
+                                .translate("-50%","-50%")
+                                .translate3d(this.x,this.y,this.z)
+                                .rotate3d(this.rotateX,this.rotateY,this.rotateZ)
+                                .scale(this.scale)
+                                .transform
                 }
-                if (this.y == undefined) {
-                    this.y = 0;
-                }
-                if (this.z == undefined) {
-                    this.z = 0;
-                }
-                css3DTransform = css3DTransform + "translate3d(" + this.x + "px," + this.y + "px," + this.z + "px)";
-
-                if (this.rotateX != null) {
-                    css3DTransform = css3DTransform + " rotateX(" + this.rotateX + "deg)";
-                }
-                if (this.rotateY != null) {
-                    css3DTransform = css3DTransform + " rotateY(" + this.rotateY + "deg)";
-                }
-                if (this.rotateZ != null) {
-                    css3DTransform = css3DTransform + " rotateZ(" + this.rotateZ + "deg)";
-                }
-
-
-                if (this.scale != null) {
-                    css3DTransform = css3DTransform + " scale(" + this.scale + ")";
-                }
-
-
-                var slide = this.$.slide;
-                css3DTransform = css3DTransform
-                slide.style.position = "absolute";
-                slide.style.webkitTransform = css3DTransform;
-                slide.style.transform = css3DTransform;
-
-                slide.style.webkitTransformStyle = "preserve-3d;"
-                slide.style.transformStyle = "preserve-3d;"
-
+                css.apply(elem,style);
 
             }
 
