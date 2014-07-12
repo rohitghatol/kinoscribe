@@ -30,4 +30,4 @@ I see the following url opens up in chrome
 References
 ===========
 
-This Project is inspired from  [Impress.js](https://github.com/bartaz/impress.js/). Thanks [Bartek Szopka](https://github.com/bartaz)
+This Project is inspired from  [Impress.js](https://github.com/bartaz/impress.js/) created by [Bartek Szopka](https://github.com/bartaz)
