@@ -35,6 +35,9 @@ var Style = function(){
     this.apply=function(elem,style){
 
 
+        if(style.overflow!=null){
+            elem.style.overflow=style.overflow;
+        }
         if(style.position!=null){
             elem.style.position=style.position;
         }
@@ -69,15 +72,9 @@ var Style = function(){
             elem.style.webkitTransition=style.transition
 
         }
-
-
-
     };
-
-
-
 }
-
+//
 //var Style = function(){
 //
 //    /**
