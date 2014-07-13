@@ -1,9 +1,9 @@
 KinoScribe 
 ==========
-### [Web Components for Prezi like Presentations]
+### [Web Components for impress.js like Presentations]
 
 
-KinoScribe is Web Components for doing Prezi like Presentation. 
+KinoScribe is Web Components for doing impress.js like Presentation.
 
 Authors
 =========
