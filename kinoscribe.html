@@ -348,7 +348,7 @@ Element providing solution to creating slides under kino-pres web component
                 opacity: 0.2;
 
                 -webkit-transition: 2000ms ease-in-out 100ms;
-                
+
             }
 
             ::content layout {
@@ -516,7 +516,6 @@ Element providing solution to creating slides under kino-pres web component
             active: false,
             attributeChanged: function(attrName, oldValue, newValue) {
                 if(attrName!='active'){
-                    console.log(attrName+" changed from "+oldValue+" to "+newValue);
                     this.render();
                 }
             },
@@ -567,8 +566,6 @@ Element providing solution to creating slides under kino-pres web component
                             .scale(this.scale)
                             .transform
                 }
-                console.log("render");
-                console.log(style);
                 css.apply(slide,style);
             },
             renderActive:function(){
@@ -587,8 +584,6 @@ Element providing solution to creating slides under kino-pres web component
                             .scale(this.activeScale)
                             .transform
                 }
-                console.log("renderActive");
-                console.log(style);
                 css.apply(slide,style);
             }
         });
@@ -1047,62 +1042,63 @@ Element providing solution to creating slides under kino-pres web component
                         var lastRotateY=0;
                         var lastRotateZ=0;
 
-                        var funcX=function(index,width){
-                            if(index==0){
+                        var funcX=function(index,dim){
+                            var face = index%4;
+                            if(face==0){
                                 return 0;
                             }
-                            if(index==1){
-                                return width/2;
+                            if(face==1){
+                                return dim.width/2;
                             }
-                            if(index==2){
+                            if(face==2){
                                 return 1 ;
                             }
-                            if(index==3){
-                                return -1 * width/2;
+                            if(face==3){
+                                return -1 * dim.width/2;
                             }
                             return 0;
                         }
 
-                        var funcZ=function(index,width){
-                            if(index==0){
-                                return width/2;
+                        var funcZ=function(index,dim){
+                            var face = index%4;
+                            if(face==0){
+                                return dim.width/2;
                             }
-                            if(index==1){
+                            if(face==1){
                                 return 0;
                             }
-                            if(index==2){
-                                return -1 * width/2;
+                            if(face==2){
+                                return -1 * dim.width/2;
                             }
-                            if(index==3){
+                            if(face==3){
                                 return 0 ;
                             }
                             return 0;
                         }
 
-                        var funcRotateY=function(index){
+                        var funcRotateY=function(index,dim){
                             return index*90;
                         }
-                        var count=0;
-                        for (var index = 0; index < slides.length; index++) {
-                            console.log(count);
-                            var slide = slides[index];
 
+                        for (var index = 0; index < slides.length; index++) {
+
+                            var slide = slides[index];
                             var dim = dimension(slide);
 
 
                             var step = {
-                                x:funcX(count,dim.width),
+                                x:funcX(index,dim),
                                 y: 0,
-                                z: funcZ(count,dim.width),
+                                z: funcZ(index,dim),
                                 rotateX: 0,
-                                rotateY: funcRotateY(index),
+                                rotateY: funcRotateY(index,dim),
                                 rotateZ: 0,
                                 scale: 1,
-                                activeX:funcX(count,dim.width),
+                                activeX:funcX(index,dim),
                                 activeY: 0,
-                                activeZ: funcZ(count,dim.width),
+                                activeZ: funcZ(index,dim),
                                 activeRotateX: 0,
-                                activeRotateY: funcRotateY(index),
+                                activeRotateY: funcRotateY(index,dim),
                                 activeRotateZ: 0,
                                 activeScale: 1.1
 
@@ -1126,12 +1122,7 @@ Element providing solution to creating slides under kino-pres web component
 
                             slideTransitions[index] = step;
 
-                            if(index==3){
-                                count=0;
-                            }
-                            else{
-                                count++;
-                            }
+
                         }
 
                         return slideTransitions;
@@ -1191,7 +1182,7 @@ Element providing solution to creating slides under kino-pres web component
                                 return dim.width/2;
                             }
                             if(face==2){
-                                return 1 ;
+                                return 0;
                             }
                             if(face==3){
                                 return -1 * dim.width/2;
@@ -1219,7 +1210,7 @@ Element providing solution to creating slides under kino-pres web component
                             return 0;
                         }
 
-                        var funcRotateY=function(index){
+                        var funcRotateY=function(index,dim){
                             return index*90;
                         }
 
@@ -1235,14 +1226,14 @@ Element providing solution to creating slides under kino-pres web component
                                 y: funcY(index,dim),
                                 z: funcZ(index,dim),
                                 rotateX: 0,
-                                rotateY: funcRotateY(index),
+                                rotateY: funcRotateY(index,dim),
                                 rotateZ: 0,
                                 scale: 1,
                                 activeX:funcX(index,dim),
                                 activeY: funcY(index,dim),
                                 activeZ: funcZ(index,dim),
                                 activeRotateX: 0,
-                                activeRotateY: funcRotateY(index),
+                                activeRotateY: funcRotateY(index,dim),
                                 activeRotateZ: 0,
                                 activeScale: 1.1
                             };
