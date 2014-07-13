@@ -4,9 +4,10 @@ KinoScribe is Web Components for doing 3D Presentations in HTML5
 
 Demo
 ======
+__3D Presentations using KinoScribe__
 ![alt text](http://rohitghatol.github.io/kinoscribe/images/kino-scribe.png "KinoScribe")
 
- Live Demo - http://rohitghatol.github.io/kinoscribe
+ __Live Demo__ - http://rohitghatol.github.io/kinoscribe
 
 Browser Compatibility
 =========
