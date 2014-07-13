@@ -23,49 +23,299 @@
             line-height: 36px;
             letter-spacing: -1px;
         }
+
+        kino-slide .transparent-slide{
+            display: block;
+            width: 800px;
+            height: 600px;
+            padding: 40px 60px;
+        }
+
+        .header1{
+
+            color: grey;
+
+            font-family: 'Open Sans', Arial, sans-serif;
+            font-size: 50px;
+            font-style: normal;
+            font-variant: normal;
+            font-weight: normal;
+
+            letter-spacing: -1px;
+            line-height: 72px;
+            text-shadow:  1px 2px 2px grey;
+            text-align: center;
+        }
+
+        .header2{
+
+            color: grey;
+
+            font-family: 'Open Sans', Arial, sans-serif;
+            font-size: 80px;
+            font-style: normal;
+            font-variant: normal;
+            font-weight: normal;
+
+            letter-spacing: -1px;
+            line-height: 72px;
+            text-shadow:  1px 2px 2px grey;
+            text-align: center;
+            width:100%;
+        }
+
+        .names{
+            font-family: 'League Gothic', Impact, sans-serif;
+            font-size: 75.61727905273438px;
+            font-style: normal;
+            font-variant: normal;
+            font-weight: normal;
+            text-shadow: 4px 4px 10px grey;
+        }
+        .padding200{
+            padding-left:200px;
+        }
+        .padding400{
+            padding-left:400px;
+        }
+
+        .presbox{
+
+            margin:0 auto;
+            width:100%;
+            padding:100px;
+
+        }
+        .slidebox{
+            font-size: 32px;
+            border-radius: 5px;
+            border:1px solid lightgrey;
+            padding:50px;
+            text-align: center;
+            text-shadow: 1px 3px 4px grey;
+            box-shadow: 5px 5px 5px #888888;
+        }
+        .code{
+            font-size: 20pt;
+        }
+
+
     </style>
 </head>
 <body unresolved>
 
 
 <kino-pres>
-    <kino-slide x="1000" type="transition" >
+    <kino-slide x="0" type="transition" >
         <section class="slide">
-            Slide 1
+            <h1 class="header1">Tired of all the Boring Presentations and Slide Decks!!</h1>
+            <div class="presbox">
+                <span class="slidebox">Slide 1</span>
+                <span class="slidebox">Slide 2</span>
+                <span class="slidebox">Slide 3</span>
+            </div>
         </section>
     </kino-slide>
 
-    <kino-slide x="2500" z="-1000">
+    <kino-slide x="1500" z="-1000">
         <section class="slide">
-            Slide 2
+            <h1 class="header1">Seen too many HTML5 Presentations, but don't want to take pain to set them up!!</h1>
+            <p class="names">Reveal.js</p>
+            </span><p class="names"><span class="padding400">Impress.js</p>
+            <p class="names"><span class="padding200">Slides.js</p>
         </section>
     </kino-slide>
 
-    <kino-slide x="4000" z="-2000" scale="3">
+    <kino-slide x="3000" z="-2000">
         <section class="slide">
-            Slide 3
+            <h1 class="header1">Its time to use the Strength of Web Components!!</h1>
+            <p class="names">Polymer.js</p>
+            </span><p class="names"><span class="padding400" style="color:red;text-shadow: 4px 4px 10px #990000">KinoScribe</p>
+            <p class="names"><span class="padding200">Web Components</p>
         </section>
+
     </kino-slide>
 
     <kino-slide x="5500" z="-3000" rotateZ="45">
         <section class="slide">
-            Slide 4
+            <h1 class="header1">Usage - Import polymer & KinoScribe</h1>
+            <pre class="code">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;script
+    src="...../0.3.3/platform.js"&gt;&lt;/script&gt;
+  &lt;link rel="import"
+    href=...../kinoscribe/kinoscribe.html"&gt;
+    ....
+&lt;/head&gt;
+  ....
+&lt;html&gt;
+            </pre>
         </section>
     </kino-slide>
-
     <kino-slide x="7000"  rotateX="90" rotateY="90">
         <section class="slide">
-            Slide 5
-        </section>
+            <h1 class="header1">Usage - Define CSS for Slide</h1>
+            <pre class="code">
+&lt;head&gt;
+  ....
+  &lt;style&gt;
+    .slide{
+        width:600px;
+        height:500px;
+        border-radius: 20px;
+        border:1px solid darkgray;
+        box-shadow:5px 5px 5px gray;
+    }
+    &lt;/style&gt;
+&lt;/head&gt;
 
+            </pre>
+        </section>
     </kino-slide>
-    <kino-slide x="8500" z="-1000" >
+
+
+    <kino-slide x="11000" z="-1000" scale="10">
         <section class="slide">
-            Slide 6
+            <h1 class="header1">Usage - Use the tags</h1>
+            <pre class="code">
+&lt;body&gt;
+  &lt;kino-pres&gt;
+    &lt;kino-slide x="100" y="0" z="100"
+                rotateX="0" rotateY="0" rotateZ="0"
+                scale="1" &gt;
+        &lt;section class="slide"&gt;
+            Slide 1
+        &lt;/section&gt;
+    &lt;/kino-slide&gt;
+    .... More such slides
+  &lt;/kino-pres&gt;
+&lt;/body&gt;
+            </pre>
         </section>
     </kino-slide>
 
+    <kino-slide x="11000" z="-1000" scale="2" rotateY="45">
+        <section class="slide" style="opacity: 0.8">
+            <h1 class="header1"
+                style="color:red;margin-top:200px;font-size:72pt;font-weight: bolder"
+                    >Let's Go Crazy!!</h1>
+        </section>
+    </kino-slide>
+    <kino-slide x="11000" y="20000" z="-1000" >
+        <section class="transparent-slide">
+            <h1 class="header2" style="color:red">x=2000</h1>
+            <h1 class="header2">Move Right</h1>
+        </section>
+    </kino-slide>
+    <kino-slide x="13000" y="20000" z="-1000" >
+        <section class="transparent-slide">
+            <h1 class="header2" style="color:red">y=2000</h1>
+            <h1 class="header2">Move Down</h1>
+        </section>
+    </kino-slide>
+    <kino-slide x="13000" y="22000" z="-1000" >
+        <section class="transparent-slide">
+            <h1 class="header2" style="color:red">z=2000</h1>
+            <h1 class="header2">Move Farther From Screen</h1>
+        </section>
+    </kino-slide>
+    <kino-slide x="13000" y="22000" z="1000" >
+        <section class="transparent-slide">
+            <h1 class="header2" style="color:red">rotatex=90</h1>
+            <h1 class="header2">Rotate Around X Axis</h1>
+        </section>
+    </kino-slide>
+    <kino-slide x="13000" y="22000" z="1000" rotateX="90">
+        <section class="transparent-slide">
+            <h1 class="header2" style="color:red">rotatey=90</h1>
+            <h1 class="header2">Rotate Around Y Axis</h1>
+        </section>
+    </kino-slide>
+    <kino-slide x="13000" y="22000" z="1000" rotateX="90" rotateY="90">
+        <section class="transparent-slide">
+            <h1 class="header2" style="color:red">rotatez=90</h1>
+            <h1 class="header2">Rotate Around Z Axis</h1>
+        </section>
+    </kino-slide>
+    <kino-slide x="13000" y="22400" z="1000" rotateX="90" rotateY="90" rotateZ="90">
+        <section class="transparent-slide">
+            <h1 class="header2" style="color:red">scale=20</h1>
+            <h1 class="header2">Scale by factor of 20</h1>
+        </section>
+    </kino-slide>
+    <kino-slide x="13000" y="22400" z="1000" rotateX="90" rotateY="90" rotateZ="90" scale="20">
+        <section class="transparent-slide">
+            <h1 class="header2" style="color:red">Mix them all up</h1>
+            <h1 class="header2" style="text-align: left;font-size: 40pt">x=1000 y=2000 z=2000</h1>
+            <h1 class="header2" style="text-align: left;font-size: 40pt">rotatex=45 rotatez=45 rotatez=45</h1>
+            <h1 class="header2" style="text-align: left;font-size: 40pt">scale=0.5</h1>
+        </section>
+    </kino-slide>
+    <kino-slide x="14000" y="24400" z="2000" rotateX="135" rotateY="135" rotateZ="135" scale="5">
+        <section class="transparent-slide">
+            <h1 class="header2" style="color:red">See how easy it is!</h1>
+        </section>
+    </kino-slide>
+    <kino-slide x="51000" z="-1000" scale="2" rotateY="45">
+        <section class="slide" style="opacity: 0.8">
+            <h1 class="header1">Upcoming Featues</h1>
 
+            <ul>
+                <li>Define 3d Transitions at kino-pres level
+                    <ul>
+                        <li>
+                            e.g &lt;kino-pres transition="spiral-3d" &gt;
+                        </li>
+                    </ul>
+                </li>
+                <li>Power Point Style Layouts<ul>
+                    <li>Title-Slide</li>
+                    <li>Section-Title</li>
+                    <li>Title-Content</li>
+                    <li>Tile-Only</li>
+                    <li>Blank</li>
+                    <li>etc</li>
+                </ul></li>
+                <li>Power Point Shapes</li>
+            </ul>
+        </section>
+    </kino-slide>
+    <kino-slide x="55000" z="-1000" scale="2" rotateY="45">
+        <section class="slide" style="opacity: 0.8">
+            <h1 class="header1">Visit our Github <a target="_blank" href="http://github.com/rohitghatol/kinoscribe">Repository</a></h1>
 
+            <div>
+                <table width="100%">
+                    <tr>
+                        <td colspan="2" align="center">
+                            <h3>Authors of KinoScribe</h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">
+                            <div>
+                                <div>
+                                    <img src="http://q11.indicthreads.com/wp-content/uploads/2011/02/Rohit-Ghatol.jpg">
+                                </div>
+                                <div><a target="_blank" href="http://www.linkedin.com/in/rohitghatol">Rohit Ghatol</a></div>
+                            </div>
+                        </td>
+                        <td align="center">
+                            <div>
+                                <div>
+                                    <img src="http://1.gravatar.com/avatar/3b2c3a62fdd5a0e18ec18249b1a24172?s=120&d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D120&r=G">
+                                </div>
+                                <div><a target="_blank" href="http://in.linkedin.com/in/walvekar">Nikhil Ghatol</a></div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </section>
+    </kino-slide>
+  </kino-pres>
 </body>
 </html>
