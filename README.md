@@ -1,9 +1,17 @@
-KinoScribe 
+KinoScribe - 3D Presentations
 ==========
-### [Web Components for impress.js like Presentations]
+KinoScribe is Web Components for doing 3D Presentations in HTML5
 
+Demo
+======
+See the Live Demo - http://rohitghatol.github.io/kinoscribe
 
-KinoScribe is Web Components for doing impress.js like Presentation.
+Browser Compatibility
+=========
+* Chrome
+* Firefox
+
+Yet to be tested on Safari and IE 10+
 
 Usage
 ======
