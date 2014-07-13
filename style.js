@@ -20,83 +20,66 @@ var negate = function(value){
 
 var inverse = function(value){
     return 1/toNumber(value);
+
 }
+
 /**
  *
-  * @constructor
+ * @constructor
  */
 var Style = function(){
 
+    var refStyle = document.createElement('dummy').style,
+        prefixes = 'Webkit Moz O ms Khtml'.split(' '),
+        cache = {};
+
+    var getBrowserSpecificStyleName= function ( styleName ) {
+        if ( typeof cache[ styleName ] === "undefined" ) {
+
+            var styleNames=getStyleNameVariations(styleName);
+
+            cache[ styleName ] = null;
+            for ( var i in styleNames ) {
+                if ( refStyle[ styleNames[i] ] !== undefined ) {
+                    cache[ styleName ] = styleNames[i];
+                    break;
+                }
+            }
+        }
+        return cache[ styleName ];
+    };
+
+    var getStyleNameVariations = function(styleName){
+        var styleNames = [];
+        styleNames.push(styleName);
+        for(var index in prefixes){
+            var prefix = prefixes[index];
+            styleNames.push(prefix+capitalize(styleName));
+        }
+        return styleNames;
+    }
+
+    var capitalize=function(name){
+        return name.charAt(0).toUpperCase() + name.substr(1);
+    }
     /**
      *
      * @param elem
      * @param style
      */
     this.apply=function(elem,style){
-
-
-        if(style.overflow!=null){
-            elem.style.overflow=style.overflow;
-        }
-        if(style.position!=null){
-            elem.style.position=style.position;
-        }
-        if(style.left!=null){
-            elem.style.left=style.left;
-        }
-        if(style.top!=null){
-            elem.style.top=style.top;
-        }
-        if(style.width!=null){
-            elem.style.width=style.width;
-        }
-        if(style.height!=null){
-            elem.style.height=style.height;
-        }
-        if(style.transform!=null){
-            elem.style.transform=style.transform;
-            elem.style.webkitTransform=style.transform;
-
-        }
-        if(style.transformStyle!=null){
-            elem.style.transformStyle=style.transformStyle;
-            elem.style.webkitTransformStyle=style.transformStyle;
-        }
-
-        if(style.webkitTransformationOrigin!=null){
-            elem.style.webkitTransformationOrigin=style.webkitTransformationOrigin
-        }
-
-        if(style.transition!=null){
-            elem.style.transition=style.transition
-            elem.style.webkitTransition=style.transition
-
+        for (var styleName in style ) {
+            if ( style.hasOwnProperty(styleName) ) {
+                var actualStyleName = getBrowserSpecificStyleName(styleName);
+                if ( actualStyleName !== null ) {
+                    elem.style[actualStyleName] = style[styleName];
+                }
+            }
         }
     };
+
+
 }
-//
-//var Style = function(){
-//
-//    /**
-//     *
-//     * @param elem
-//     * @param style
-//     */
-//    this.apply=function(elem,style){
-//        if(style.transformStyle!=null){
-//            style.webkitTransformStyle=style.transformStyle;
-//        }
-//        if(style.transition!=null){
-//            style.webkitTransition=style.transition
-//        }
-//        for(var key in style){
-//            elem.style[key]=style[key];
-//        }
-//
-//    };
-//
-//
-//}
 /**
  *
  * @constructor
@@ -121,7 +104,7 @@ var TransformBuilder = function(){
     }
     this.perspective=function(perspective){
         if(perspective!=null){
-            this.transform+= " perspective("+toNumber(perspective)+") ";
+            this.transform+= " perspective("+toPosition(perspective)+") ";
         }
         return this;
     }

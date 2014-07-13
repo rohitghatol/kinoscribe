@@ -53,7 +53,6 @@ Element providing solution to creating prezi like slideshow in browser
 
 </template>
 <script src="style.js"></script>
-<script src="event.js"></script>
 <script>
 
     Polymer('kino-pres', {
@@ -98,6 +97,7 @@ Element providing solution to creating prezi like slideshow in browser
          */
         attached: function () {
 
+
             var css = new Style();
             css.apply(document.body,{
                 overflow:"hidden",
@@ -141,6 +141,8 @@ Element providing solution to creating prezi like slideshow in browser
 
                 this.slideTransitions[index] = step;
             }
+
+
             this.goto(this.currentSlide);
 
             
@@ -180,6 +182,14 @@ Element providing solution to creating prezi like slideshow in browser
                 self.goto(self.currentSlide);
             }, false);
 
+            window.addEventListener("hashchange", function () {
+                self.readSlideNumFromHash();
+            }, false);
+
+            setTimeout(function(){
+                self.readSlideNumFromHash();
+            },500);
+
         },
         currentSlideChanged: function (oldValue, newValue) {
             var slides = this.getSlides();
@@ -187,8 +197,8 @@ Element providing solution to creating prezi like slideshow in browser
             var nextSlide = slides[newValue-1];
 
             this.fire("slideChanged",newValue,this);
-            this.fire("enter",'',nextSlide);
-            this.fire("exit",'',prevSlide);
+            this.fire("enter",newValue,nextSlide);
+            this.fire("exit",oldValue,prevSlide);
 
             this.goto(this.currentSlide);
         },
@@ -199,6 +209,17 @@ Element providing solution to creating prezi like slideshow in browser
             this.currentSlide = this.currentSlide <= 1 ? this.slideTransitions.length : (this.currentSlide - 1);
         },
 
+        readSlideNumFromHash:function(){
+            var slideNum=window.location.hash.replace(/^#\/?/,"");
+            var newValue = toNumber(slideNum,this.currentSlide);
+            //If use gives wrong range, move to current slide
+            if(newValue>0 && newValue<=this.slides){
+                this.currentSlide=newValue;
+            }
+            else{
+                window.location.hash =   "#/" + this.currentSlide;
+            }
+        },
         goto: function (currentSlide) {
             window.scrollTo(0, 0);
             this.modifyRoot(currentSlide);
@@ -220,9 +241,10 @@ Element providing solution to creating prezi like slideshow in browser
                     .scale(scaleValue)
                     .transform;
 
+            console.log(transform);
             var style={
                 position:"absolute",
-                webkitTransformationOrigin : "0% 0%",
+                transformationOrigin : "0% 0%",
                 transition:"all 1000ms ease-in-out 0ms",
                 top:"50%",
                 left:"50%",
@@ -244,7 +266,7 @@ Element providing solution to creating prezi like slideshow in browser
                     .transform
             var style={
                 position:"absolute",
-                webkitTransformationOrigin : "0% 0%",
+                transformationOrigin : "0% 0%",
                 transition:"all 1000ms ease-in-out 0ms",
                 transformStyle:"preserve-3d",
                 transform:transform
@@ -441,12 +463,15 @@ Element providing solution to creating slides under kino-pres web component
                 }
                 css.apply(elem,style);
 
-                this.addEventListener("enter",function(){
+                this.addEventListener("enter",function(event){
                     this.active=true;
+                    window.location.hash =   "#/" + toNumber(event.detail);
                 });
-                this.addEventListener("exit",function(){
+                this.addEventListener("exit",function(event){
                     this.active=false;
                 });
+
+
 
             }
 
