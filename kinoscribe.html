@@ -82,6 +82,9 @@ Element providing solution to creating impress.js like slideshow in browser
         slideTransitions: [],
 
         /**
+         */
+        initialized:false,
+        /**
          * Slide Transition
          * @attribute transition
          * @type string
@@ -99,7 +102,11 @@ Element providing solution to creating impress.js like slideshow in browser
             transitionDuration: 1000
         },
 
-
+        transitionChanged:function(oldValue,newValue){
+            if(this.initialized){
+                this.render();
+            }
+        },
         /**
          *
          */
@@ -111,33 +118,12 @@ Element providing solution to creating impress.js like slideshow in browser
                 overflow:"hidden",
                 height:"100%"
             })
-
-
-
-            var transitionElem=document.querySelector(this.transition)||this.$.defaultTransition;
-            transitionElem.addEventListener("layout-ready",function(event){
-                self.init(new event.detail.layout());
-            });
-            this.fire("layout-request",null,transitionElem);
-
-
-
-
+            this.init();
+            this.render();
         },
-        fetchLayout:function(){
 
-        },
-        init:function(layout){
+        init:function(){
             var self = this;
-            var nodes = this.getSlides();
-            this.slides=nodes.length;
-            nodes[0].active = true;
-            this.slideTransitions=layout.calculateSlideTransitions(nodes);
-
-            this.goto(this.currentSlide);
-
-
-
             document.addEventListener("keydown", function (event) {
                 //On Left Arrow
                 if (37 === event.keyCode) {
@@ -177,9 +163,30 @@ Element providing solution to creating impress.js like slideshow in browser
                 self.readSlideNumFromHash();
             }, false);
 
+
+            self.readSlideNumFromHash();
+
+        },
+
+        render:function(){
+            var self=this;
+            var transitionElem=document.querySelector(this.transition)||this.$.defaultTransition;
+            transitionElem.addEventListener("layout-ready",function(event){
+                self.renderLayout(new event.detail.layout());
+            });
+            this.fire("layout-request",null,transitionElem);
+        },
+        renderLayout:function(layout){
+            var nodes = this.getSlides();
+            this.slides=nodes.length;
+            nodes[0].active = true;
+            this.slideTransitions=layout.calculateSlideTransitions(nodes);
+            this.goto(this.currentSlide);
+            var self=this;
             setTimeout(function(){
-                self.readSlideNumFromHash();
-            },500);
+                self.initialized=true;
+            },2000);
+
         },
         currentSlideChanged: function (oldValue, newValue) {
             var slides = this.getSlides();
