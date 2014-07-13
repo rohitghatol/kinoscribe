@@ -1,11 +1,21 @@
+KinoScribe 
+==========
+### [Web Components for impress.js like Presentations]
+
+
+KinoScribe is Web Components for doing impress.js like Presentation.
+
+Usage
+======
+```
 <!doctype html>
 <html>
 <head>
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
     <title>kino-slides Demo</title>
 
-    <script src="platform/platform.js"></script>
-    <link rel="import" href="kinoscribe/kinoscribe.html">
+    <script src="../platform/platform.js"></script>
+    <link rel="import" href="kinoscribe.html">
     <style>
         kino-slide .slide{
             display: block;
@@ -69,3 +79,31 @@
 
 </body>
 </html>
+
+```
+Authors
+=========
+ * Rohit Ghatol - @rohitghatol
+ * Nikhil Walvekar - @walvekarnikhil
+
+Project Setup
+==============
+If you are a Developer and want to play with the code. Here is how you setup this Project.
+
+ * Checkout polymer-projects project - $>git clone https://github.com/rohitghatol/polymer-projects
+ * On Windows - Run the command cmd>checkout-components.cmd 
+ * On Linux/Mac - Run the command cmd>checkout-components.sh
+ 
+Running the Demo
+-----------------
+
+In my case I use WebStorm, I right click on kinoscribe/demo.html and click on "Open in Brower"
+I see the following url opens up in chrome
+
+* http://localhost:63342/polymer-projects/kinoscribe/demo.html
+
+ 
+References
+===========
+
+This Project is inspired from  [Impress.js](https://github.com/bartaz/impress.js/) created by [Bartek Szopka](https://github.com/bartaz)

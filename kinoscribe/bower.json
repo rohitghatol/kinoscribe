@@ -1,0 +1,29 @@
+{
+  "name": "kinoscribe",
+  "version": "0.0.1",
+  "keywords": [
+    "3d",
+    "presentation",
+    "polymer",
+    "webcomponent",
+    "synerzip"
+  ],
+  "main": "kinoscribe.html",
+  "dependencies": {
+    "polymer": "~0.3.3"
+  },
+  "homepage": "https://github.com/rohitghatol/kinoscribe",
+  "authors": [
+    "Rohit Ghatol"
+  ],
+  "description": "Make 3D HTML5 Presentations with ease with kinoscribel webcomponents",
+  "license": "Apache 2.0 License",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "../",
+    "test",
+    "tests"
+  ]
+}
