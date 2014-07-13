@@ -212,6 +212,7 @@ Element providing solution to creating impress.js like slideshow in browser
         },
         goto: function (currentSlide) {
             window.scrollTo(0, 0);
+
             this.modifyRoot(currentSlide);
             this.modifyContainer(currentSlide);
         },
@@ -221,7 +222,7 @@ Element providing solution to creating impress.js like slideshow in browser
 
 
             var root = this.$.preso;
-            var targetScale = inverse(step.scale) * this.windowScale(this.config);
+            var targetScale = inverse(step.activeScale) * this.windowScale(this.config);
             var perspectiveValue = this.config.perspective / targetScale;
             var scaleValue = targetScale;
 
@@ -251,8 +252,8 @@ Element providing solution to creating impress.js like slideshow in browser
 
             var transformBuilder = new TransformBuilder();
             var transform = transformBuilder
-                    .rotate3d(negate(step.rotateX),negate(step.rotateY),negate(step.rotateZ),true)
-                    .translate3d(negate(step.x),negate(step.y),negate(step.z))
+                    .rotate3d(negate(step.activeRotateX),negate(step.activeRotateY),negate(step.activeRotateZ),true)
+                    .translate3d(negate(step.activeX),negate(step.activeY),negate(step.activeZ))
                     .transform
             var style={
                 position:"absolute",
@@ -324,7 +325,7 @@ Element providing solution to creating slides under kino-pres web component
 @homepage http://github.com/Synerzip/kinoscribe
 -->
 
-<polymer-element name="kino-slide" attributes="x y z rotateX rotateY rotateZ scale active">
+<polymer-element name="kino-slide" attributes="x y z rotateX rotateY rotateZ scale active activeX activeY activeZ activeRotateX activeRotateY activeRotateZ activeScale">
 
     <template>
 
@@ -334,14 +335,20 @@ Element providing solution to creating slides under kino-pres web component
 
             #slide {
                 position: relative;
+
             }
 
             .active {
-                opacity: 0.5;
+                opacity: 1;
+                -webkit-transition: 200ms ease-in-out 100ms;
+
             }
 
             .inactive {
                 opacity: 0.2;
+
+                -webkit-transition: 2000ms ease-in-out 100ms;
+                
             }
 
             ::content layout {
@@ -371,6 +378,8 @@ Element providing solution to creating slides under kino-pres web component
              */
             x: 0,
 
+
+
             /**
              * The `y` position of the slide on the 3D Presentation Canvas
              *
@@ -379,6 +388,8 @@ Element providing solution to creating slides under kino-pres web component
              * @default 0
              */
             y: 0,
+
+
 
             /**
              * The `z` position of the slide on the 3D Presentation Canvas
@@ -389,6 +400,7 @@ Element providing solution to creating slides under kino-pres web component
              */
             z: 0,
 
+
             /**
              * The angle of rotation along 'x' axis of the slide on the 3D Presentation Canvas
              *
@@ -397,6 +409,8 @@ Element providing solution to creating slides under kino-pres web component
              * @default 0
              */
             rotateX: 0,
+
+
 
             /**
              * The angle of rotation along 'y' axis of the slide on the 3D Presentation Canvas
@@ -407,6 +421,7 @@ Element providing solution to creating slides under kino-pres web component
              */
             rotateY: 0,
 
+
             /**
              * The angle of rotation along 'z' axis of the slide on the 3D Presentation Canvas
              *
@@ -415,6 +430,7 @@ Element providing solution to creating slides under kino-pres web component
              * @default 0
              */
             rotateZ: 0,
+
 
             /**
              * The magnification scale of this slide
@@ -425,6 +441,71 @@ Element providing solution to creating slides under kino-pres web component
              */
             scale: 1,
 
+
+            /**
+             * The `x` position of the slide when selected
+             *
+             * @attribute activeX
+             * @type num
+             * @default 0
+             */
+            activeX: null,
+
+            /**
+             * The `y` position of the slide when selected
+             *
+             * @attribute activeY
+             * @type num
+             * @default 0
+             */
+            activeY: null,
+
+            /**
+             * The `z` position of the slide when selected
+             *
+             * @attribute activeZ
+             * @type num
+             * @default 0
+             */
+            activeZ: null,
+
+            /**
+             * The angle of rotation along 'x' axis of the slide when selected
+             *
+             * @attribute activeRotateX
+             * @type num
+             * @default 0
+             */
+            activeRotateX: null,
+
+            /**
+             * The angle of rotation along 'y' axis of the slide when selected
+             *
+             * @attribute activeRotateY
+             * @type num
+             * @default 0
+             */
+            activeRotateY: null,
+
+
+            /**
+             * The angle of rotation along 'z' axis of the slide when selected
+             *
+             * @attribute activeRotateZ
+             * @type num
+             * @default 0
+             */
+            activeRotateZ: null,
+
+            /**
+             * The magnification scale when selected
+             *
+             * @attribute activeScale
+             * @type num
+             * @default 0
+             */
+            activeScale: null,
+
             /**
              * Indication of this slide being the Active/Current Slide being shown
              *
@@ -433,54 +514,44 @@ Element providing solution to creating slides under kino-pres web component
              * @default false
              */
             active: false,
-
-            xChanged:function(oldValue,newValue){
-                console.log("X changed from "+oldValue+" to "+newValue);
-                this.render();
-            },
-            yChanged:function(oldValue,newValue){
-                console.log("Y changed from "+oldValue+" to "+newValue);
-                this.render();
-            },
-            zChanged:function(oldValue,newValue){
-                console.log("Z changed from "+oldValue+" to "+newValue);
-
-                this.render();
-            },
-            rotateXChanged:function(oldValue,newValue){
-                console.log("rotateX changed from "+oldValue+" to "+newValue);
-
-                this.render();
-            },
-            rotateYChanged:function(oldValue,newValue){
-                console.log("rotateY changed from "+oldValue+" to "+newValue);
-
-                this.render();
-            },
-            rotateZChanged:function(oldValue,newValue){
-                console.log("rotateZ changed from "+oldValue+" to "+newValue);
-
-                this.render();
-            },
-            scaleChanged:function(oldValue,newValue){
-                console.log("Scale changed from "+oldValue+" to "+newValue);
-                this.render();
+            attributeChanged: function(attrName, oldValue, newValue) {
+                if(attrName!='active'){
+                    console.log(attrName+" changed from "+oldValue+" to "+newValue);
+                    this.render();
+                }
             },
 
 
             domReady: function () {
+                var self=this;
+                this.init();
                 this.render();
 
                 this.addEventListener("enter",function(event){
                     this.active=true;
                     window.location.hash =   "#/" + toNumber(event.detail);
+                    self.renderActive();
                 });
                 this.addEventListener("exit",function(event){
                     this.active=false;
+                    self.render();
                 });
             },
+            init:function(){
+                this.activeX=this.activeX||this.x;
+                this.activeY=this.activeY||this.y;
+                this.activeZ=this.activeZ||this.z;
+
+                this.activeRotateX=this.activeRotateX||this.rotateX;
+                this.activeRotateY=this.activeRotateY||this.rotateY;
+                this.activeRotateZ=this.activeRotateZ||this.rotateZ;
+
+                this.activeScale = this.activeScale||this.scale;
+
+
+
+            },
             render:function(){
-                console.log("render");
                 var slide = this.$.slide;
 
                 var css = new Style();
@@ -496,6 +567,28 @@ Element providing solution to creating slides under kino-pres web component
                             .scale(this.scale)
                             .transform
                 }
+                console.log("render");
+                console.log(style);
+                css.apply(slide,style);
+            },
+            renderActive:function(){
+                var slide = this.$.slide;
+
+                var css = new Style();
+                var transformBuilder = new TransformBuilder();
+
+                var style={
+                    position:"absolute",
+                    transformStyle:"preserve-3d",
+                    transform:transformBuilder
+                            .translate("-50%","-50%")
+                            .translate3d(this.activeX,this.activeY,this.activeZ)
+                            .rotate3d(this.activeRotateX,this.activeRotateY,this.activeRotateZ)
+                            .scale(this.activeScale)
+                            .transform
+                }
+                console.log("renderActive");
+                console.log(style);
                 css.apply(slide,style);
             }
         });
@@ -533,7 +626,10 @@ Element providing solution to creating slides under kino-pres web component
                             var step = {
                                 x: 0, y: 0, z: 0,
                                 rotateX: 0, rotateY: 0, rotateZ: 0,
-                                scale: 1
+                                scale: 1,
+                                activeX: 0, activeY: 0, activeZ: 0,
+                                activeRotateX: 0, activeRotateY: 0, activeRotateZ: 0,
+                                activeScale: 1
                             };
                             if (slide.attributes.x != null) {
                                 step.x = toNumber(slide.attributes.x.value);
@@ -555,6 +651,36 @@ Element providing solution to creating slides under kino-pres web component
                             }
                             if (slide.attributes.scale != null) {
                                 step.scale = toNumber(slide.attributes.scale.value, 1);
+                            }
+                            step.activeX=step.x;
+                            step.activeY=step.y;
+                            step.activeZ=step.z;
+                            step.activeRotateX=step.rotateX;
+                            step.activeRotateY=step.rotateY;
+                            step.activeRotateZ=step.rotateZ;
+                            step.activeScale=step.scale;
+
+
+                            if (slide.attributes.activeX != null) {
+                                step.activeX = toNumber(slide.attributes.activeX.value);
+                            }
+                            if (slide.attributes.activeY != null) {
+                                step.activeY = toNumber(slide.attributes.activeY.value);
+                            }
+                            if (slide.attributes.activeZ != null) {
+                                step.activeZ = toNumber(slide.attributes.activeZ.value);
+                            }
+                            if (slide.attributes.activeRotateZ != null) {
+                                step.activeRotateZ = toNumber(slide.attributes.activeRotateZ.value);
+                            }
+                            if (slide.attributes.activeRotateY != null) {
+                                step.activeRotateY = toNumber(slide.attributes.activeRotateY.value);
+                            }
+                            if (slide.attributes.activeRotateX != null) {
+                                step.activeRotateX = toNumber(slide.attributes.activeRotateX.value);
+                            }
+                            if (slide.attributes.activeScale != null) {
+                                step.activeScale = toNumber(slide.attributes.activeScale.value, 1);
                             }
 
                             slideTransitions[index] = step;
@@ -613,7 +739,10 @@ Element providing solution to creating slides under kino-pres web component
                             var step = {
                                 x: lastWidth, y: 0, z: 0,
                                 rotateX: 0, rotateY: 0, rotateZ: 0,
-                                scale: 1
+                                scale: 1,
+                                activeX:lastWidth,activeY:0, activeZ:0,
+                                activeRotateX:0,activeRotateY:0, activeRotateZ:0,
+                                activeScale:1
                             };
                             slide.setAttribute('x',step.x);
                             slide.setAttribute('y',step.y);
@@ -621,8 +750,93 @@ Element providing solution to creating slides under kino-pres web component
                             slide.setAttribute('rotateX',step.rotateX);
                             slide.setAttribute('rotateY',step.rotateY);
                             slide.setAttribute('rotateZ',step.rotateZ);
-                            slide.setAttribute('scale',1);
+                            slide.setAttribute('scale',step.scale);
 
+                            slide.setAttribute('activeX',step.activeX);
+                            slide.setAttribute('activeY',step.activeY);
+                            slide.setAttribute('activeZ',step.activeZ);
+                            slide.setAttribute('activeRotateX',step.activeRotateX);
+                            slide.setAttribute('activeRotateY',step.activeRotateY);
+                            slide.setAttribute('activeRotateZ',step.activeRotateZ);
+                            slide.setAttribute('activeScale',step.activeScale);
+
+
+
+                            slideTransitions[index] = step;
+                        }
+
+                        return slideTransitions;
+                    }
+                };
+
+                return layout;
+            }
+        });
+    </script>
+</polymer-element>
+
+
+<polymer-element name="kino-transition-left-to-right-emphasis" extends="kino-transition-default">
+
+    <template>
+        <style>
+            :host{
+                display:none;
+            }
+        </style>
+    </template>
+
+    <script>
+        Polymer('kino-transition-left-to-right-emphasis', {
+
+            layoutProvider:function(){
+                var dimension = function(slide){
+                    var dim = {
+                        width:0,
+                        height:0
+                    };
+                    for(var index =0;index<slide.children.length;index++){
+                        dim.width+=slide.children[index].offsetWidth;
+                        dim.height+=slide.children[index].offsetHeight;
+                    }
+                    return dim;
+                }
+                var layout = function(){
+
+                    this.calculateSlideTransitions=function(slides){
+
+                        var slideTransitions=[];
+
+                        var lastWidth=0;
+                        for (var index = 0; index < slides.length; index++) {
+                            var slide = slides[index];
+
+                            var dim = dimension(slide);
+
+                            lastWidth+=dim.width;
+                            var step = {
+                                x: lastWidth, y: 0, z: 0,
+                                rotateX: 0, rotateY: 0, rotateZ: 0,
+                                scale: 1,
+                                activeX:lastWidth,activeY:0, activeZ:0,
+                                activeRotateX:0,activeRotateY:0, activeRotateZ:0,
+                                activeScale:1.2
+                            };
+                            slide.setAttribute('x',step.x);
+                            slide.setAttribute('y',step.y);
+                            slide.setAttribute('z',step.z);
+                            slide.setAttribute('rotateX',step.rotateX);
+                            slide.setAttribute('rotateY',step.rotateY);
+                            slide.setAttribute('rotateZ',step.rotateZ);
+                            slide.setAttribute('scale',step.scale);
+
+                            slide.setAttribute('activeX',step.activeX);
+                            slide.setAttribute('activeY',step.activeY);
+                            slide.setAttribute('activeZ',step.activeZ);
+                            slide.setAttribute('activeRotateX',step.activeRotateX);
+                            slide.setAttribute('activeRotateY',step.activeRotateY);
+                            slide.setAttribute('activeRotateZ',step.activeRotateZ);
+                            slide.setAttribute('activeScale',step.activeScale);
 
 
 
@@ -683,7 +897,10 @@ Element providing solution to creating slides under kino-pres web component
                             var step = {
                                 x: 0, y: lastHeight, z: 0,
                                 rotateX: 0, rotateY: 0, rotateZ: 0,
-                                scale: 1
+                                scale: 1,
+                                activeX:0,activeY:lastHeight, activeZ:0,
+                                activeRotateX:0,activeRotateY:0, activeRotateZ:0,
+                                activeScale:1
                             };
                             slide.setAttribute('x',step.x);
                             slide.setAttribute('y',step.y);
@@ -691,10 +908,15 @@ Element providing solution to creating slides under kino-pres web component
                             slide.setAttribute('rotateX',step.rotateX);
                             slide.setAttribute('rotateY',step.rotateY);
                             slide.setAttribute('rotateZ',step.rotateZ);
-                            slide.setAttribute('scale',1);
+                            slide.setAttribute('scale',step.scale);
 
-
-
+                            slide.setAttribute('activeX',step.activeX);
+                            slide.setAttribute('activeY',step.activeY);
+                            slide.setAttribute('activeZ',step.activeZ);
+                            slide.setAttribute('activeRotateX',step.activeRotateX);
+                            slide.setAttribute('activeRotateY',step.activeRotateY);
+                            slide.setAttribute('activeRotateZ',step.activeRotateZ);
+                            slide.setAttribute('activeScale',step.activeScale);
 
                             slideTransitions[index] = step;
                         }
@@ -709,6 +931,83 @@ Element providing solution to creating slides under kino-pres web component
     </script>
 </polymer-element>
 
+
+
+
+<polymer-element name="kino-transition-top-to-bottom-emphasis" extends="kino-transition-default">
+
+    <template>
+        <style>
+            :host{
+                display:none;
+            }
+        </style>
+    </template>
+
+    <script>
+        Polymer('kino-transition-top-to-bottom-emphasis', {
+
+            layoutProvider:function(){
+                var dimension = function(slide){
+                    var dim = {
+                        width:0,
+                        height:0
+                    };
+                    for(var index =0;index<slide.children.length;index++){
+                        dim.width+=slide.children[index].offsetWidth;
+                        dim.height+=slide.children[index].offsetHeight;
+                    }
+                    return dim;
+                }
+                var layout = function(){
+
+                    this.calculateSlideTransitions=function(slides){
+
+                        var slideTransitions=[];
+
+                        var lastHeight=0;
+                        for (var index = 0; index < slides.length; index++) {
+                            var slide = slides[index];
+
+                            var dim = dimension(slide);
+
+                            lastHeight+=dim.height;
+                            var step = {
+                                x: 0, y: lastHeight, z: 0,
+                                rotateX: 0, rotateY: 0, rotateZ: 0,
+                                scale: 1,
+                                activeX:0,activeY:lastHeight, activeZ:0,
+                                activeRotateX:0,activeRotateY:0, activeRotateZ:0,
+                                activeScale:1.2
+                            };
+                            slide.setAttribute('x',step.x);
+                            slide.setAttribute('y',step.y);
+                            slide.setAttribute('z',step.z);
+                            slide.setAttribute('rotateX',step.rotateX);
+                            slide.setAttribute('rotateY',step.rotateY);
+                            slide.setAttribute('rotateZ',step.rotateZ);
+                            slide.setAttribute('scale',step.scale);
+
+                            slide.setAttribute('activeX',step.activeX);
+                            slide.setAttribute('activeY',step.activeY);
+                            slide.setAttribute('activeZ',step.activeZ);
+                            slide.setAttribute('activeRotateX',step.activeRotateX);
+                            slide.setAttribute('activeRotateY',step.activeRotateY);
+                            slide.setAttribute('activeRotateZ',step.activeRotateZ);
+                            slide.setAttribute('activeScale',step.activeScale);
+
+                            slideTransitions[index] = step;
+                        }
+
+                        return slideTransitions;
+                    }
+                };
+
+                return layout;
+            }
+        });
+    </script>
+</polymer-element>
 
 
 <polymer-element name="kino-transition-box" extends="kino-transition-default">
@@ -798,7 +1097,15 @@ Element providing solution to creating slides under kino-pres web component
                                 rotateX: 0,
                                 rotateY: funcRotateY(index),
                                 rotateZ: 0,
-                                scale: 1
+                                scale: 1,
+                                activeX:funcX(count,dim.width),
+                                activeY: 0,
+                                activeZ: funcZ(count,dim.width),
+                                activeRotateX: 0,
+                                activeRotateY: funcRotateY(index),
+                                activeRotateZ: 0,
+                                activeScale: 1.1
+
                             };
                             slide.setAttribute('x',step.x);
                             slide.setAttribute('y',step.y);
@@ -806,9 +1113,15 @@ Element providing solution to creating slides under kino-pres web component
                             slide.setAttribute('rotateX',step.rotateX);
                             slide.setAttribute('rotateY',step.rotateY);
                             slide.setAttribute('rotateZ',step.rotateZ);
-                            slide.setAttribute('scale',1);
+                            slide.setAttribute('scale',step.scale);
 
-
+                            slide.setAttribute('activeX',step.activeX);
+                            slide.setAttribute('activeY',step.activeY);
+                            slide.setAttribute('activeZ',step.activeZ);
+                            slide.setAttribute('activeRotateX',step.activeRotateX);
+                            slide.setAttribute('activeRotateY',step.activeRotateY);
+                            slide.setAttribute('activeRotateZ',step.activeRotateZ);
+                            slide.setAttribute('activeScale',step.activeScale);
 
 
                             slideTransitions[index] = step;
@@ -869,36 +1182,38 @@ Element providing solution to creating slides under kino-pres web component
                         var lastRotateY=0;
                         var lastRotateZ=0;
 
-                        var funcX=function(index,width){
-                            if(index==0){
+                        var funcX=function(index,dim){
+                            var face=index%4;
+                            if(face==0){
                                 return 0;
                             }
-                            if(index==1){
-                                return width/2;
+                            if(face==1){
+                                return dim.width/2;
                             }
-                            if(index==2){
+                            if(face==2){
                                 return 1 ;
                             }
-                            if(index==3){
-                                return -1 * width/2;
+                            if(face==3){
+                                return -1 * dim.width/2;
                             }
                             return 0;
                         }
-                        var funcY=function(index,height){
-                            return index*(height/2)
+                        var funcY=function(index,dim){
+                            return index*(dim.height/2)
 
                         }
-                        var funcZ=function(index,width){
-                            if(index==0){
-                                return width/2;
+                        var funcZ=function(index,dim){
+                            var face = index % 4;
+                            if(face==0){
+                                return dim.width/2;
                             }
-                            if(index==1){
+                            if(face==1){
                                 return 0;
                             }
-                            if(index==2){
-                                return -1 * width/2;
+                            if(face==2){
+                                return -1 * dim.width/2;
                             }
-                            if(index==3){
+                            if(face==3){
                                 return 0 ;
                             }
                             return 0;
@@ -907,22 +1222,29 @@ Element providing solution to creating slides under kino-pres web component
                         var funcRotateY=function(index){
                             return index*90;
                         }
-                        var count=0;
+
                         for (var index = 0; index < slides.length; index++) {
-                            console.log(count);
+
                             var slide = slides[index];
 
                             var dim = dimension(slide);
 
 
                             var step = {
-                                x:funcX(count,dim.width),
-                                y: funcY(index,dim.height),
-                                z: funcZ(count,dim.width),
+                                x:funcX(index,dim),
+                                y: funcY(index,dim),
+                                z: funcZ(index,dim),
                                 rotateX: 0,
                                 rotateY: funcRotateY(index),
                                 rotateZ: 0,
-                                scale: 1
+                                scale: 1,
+                                activeX:funcX(index,dim),
+                                activeY: funcY(index,dim),
+                                activeZ: funcZ(index,dim),
+                                activeRotateX: 0,
+                                activeRotateY: funcRotateY(index),
+                                activeRotateZ: 0,
+                                activeScale: 1.1
                             };
                             slide.setAttribute('x',step.x);
                             slide.setAttribute('y',step.y);
@@ -930,19 +1252,126 @@ Element providing solution to creating slides under kino-pres web component
                             slide.setAttribute('rotateX',step.rotateX);
                             slide.setAttribute('rotateY',step.rotateY);
                             slide.setAttribute('rotateZ',step.rotateZ);
-                            slide.setAttribute('scale',1);
+                            slide.setAttribute('scale',step.scale);
 
-
+                            slide.setAttribute('activeX',step.activeX);
+                            slide.setAttribute('activeY',step.activeY);
+                            slide.setAttribute('activeZ',step.activeZ);
+                            slide.setAttribute('activeRotateX',step.activeRotateX);
+                            slide.setAttribute('activeRotateY',step.activeRotateY);
+                            slide.setAttribute('activeRotateZ',step.activeRotateZ);
+                            slide.setAttribute('activeScale',step.activeScale);
 
 
                             slideTransitions[index] = step;
 
-                            if(index==3){
-                                count=0;
-                            }
-                            else{
-                                count++;
-                            }
+
+                        }
+
+                        return slideTransitions;
+                    }
+                };
+
+                return layout;
+            }
+        });
+    </script>
+</polymer-element>
+
+
+<polymer-element name="kino-transition-file-cabinet" extends="kino-transition-default">
+
+    <template>
+        <style>
+            :host{
+                display:none;
+            }
+        </style>
+    </template>
+
+    <script>
+        Polymer('kino-transition-file-cabinet', {
+
+            layoutProvider:function(){
+                var dimension = function(slide){
+                    var dim = {
+                        width:0,
+                        height:0
+                    };
+                    for(var index =0;index<slide.children.length;index++){
+                        dim.width+=slide.children[index].offsetWidth;
+                        dim.height+=slide.children[index].offsetHeight;
+                    }
+                    return dim;
+                }
+                var layout = function(){
+
+                    this.calculateSlideTransitions=function(slides){
+
+                        var slideTransitions=[];
+                        var lastX=0
+                        var lastY=0;
+                        var lastZ=0;
+                        var lastRotateX=0;
+                        var lastRotateY=0;
+                        var lastRotateZ=0;
+
+                        var funcX=function(index,dim){
+                            return index * 100;
+                        }
+                        var funcRotateY=function(index,dim){
+                            return 90;
+                        }
+                        var funcActiveRotateY=function(index,dim){
+                            return 0;
+                        }
+                        var funcActiveZ=function(index,dim){
+                            return dim.width/2;
+                        }
+
+                        for (var index = 0; index < slides.length; index++) {
+
+                            var slide = slides[index];
+
+                            var dim = dimension(slide);
+
+
+                            var step = {
+                                x:funcX(index,dim),
+                                y: 0,
+                                z: 0,
+                                rotateX: 0,
+                                rotateY: funcRotateY(index),
+                                rotateZ: 0,
+                                scale: 1,
+                                activeX:funcX(index,dim),
+                                activeY: 0,
+                                activeZ: funcActiveZ(index,dim),
+                                activeRotateX: 0,
+                                activeRotateY: funcActiveRotateY(index,dim),
+                                activeRotateZ: 0,
+                                activeScale: 1
+                            };
+                            slide.setAttribute('x',step.x);
+                            slide.setAttribute('y',step.y);
+                            slide.setAttribute('z',step.z);
+                            slide.setAttribute('rotateX',step.rotateX);
+                            slide.setAttribute('rotateY',step.rotateY);
+                            slide.setAttribute('rotateZ',step.rotateZ);
+                            slide.setAttribute('scale',step.scale);
+
+                            slide.setAttribute('activeX',step.activeX);
+                            slide.setAttribute('activeY',step.activeY);
+                            slide.setAttribute('activeZ',step.activeZ);
+                            slide.setAttribute('activeRotateX',step.activeRotateX);
+                            slide.setAttribute('activeRotateY',step.activeRotateY);
+                            slide.setAttribute('activeRotateZ',step.activeRotateZ);
+                            slide.setAttribute('activeScale',step.activeScale);
+
+
+                            slideTransitions[index] = step;
+
+
                         }
 
                         return slideTransitions;
