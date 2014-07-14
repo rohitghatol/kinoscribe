@@ -1,0 +1,74 @@
+<polymer-element name="kino-transition-top-to-bottom" extends="kino-transition-default">
+
+    <template>
+        <style>
+            :host{
+                display:none;
+            }
+        </style>
+    </template>
+
+    <script>
+        Polymer('kino-transition-top-to-bottom', {
+
+            layoutProvider:function(){
+                var dimension = function(slide){
+                    var dim = {
+                        width:0,
+                        height:0
+                    };
+                    for(var index =0;index<slide.children.length;index++){
+                        dim.width+=slide.children[index].offsetWidth;
+                        dim.height+=slide.children[index].offsetHeight;
+                    }
+                    return dim;
+                }
+                var layout = function(){
+
+                    this.calculateSlideTransitions=function(slides){
+
+                        var slideTransitions=[];
+
+                        var lastHeight=0;
+                        for (var index = 0; index < slides.length; index++) {
+                            var slide = slides[index];
+
+                            var dim = dimension(slide);
+
+                            lastHeight+=dim.height;
+                            var step = {
+                                x: 0, y: lastHeight, z: 0,
+                                rotateX: 0, rotateY: 0, rotateZ: 0,
+                                scale: 1,
+                                activeX:0,activeY:lastHeight, activeZ:0,
+                                activeRotateX:0,activeRotateY:0, activeRotateZ:0,
+                                activeScale:1
+                            };
+                            slide.setAttribute('x',step.x);
+                            slide.setAttribute('y',step.y);
+                            slide.setAttribute('z',step.z);
+                            slide.setAttribute('rotateX',step.rotateX);
+                            slide.setAttribute('rotateY',step.rotateY);
+                            slide.setAttribute('rotateZ',step.rotateZ);
+                            slide.setAttribute('scale',step.scale);
+
+                            slide.setAttribute('activeX',step.activeX);
+                            slide.setAttribute('activeY',step.activeY);
+                            slide.setAttribute('activeZ',step.activeZ);
+                            slide.setAttribute('activeRotateX',step.activeRotateX);
+                            slide.setAttribute('activeRotateY',step.activeRotateY);
+                            slide.setAttribute('activeRotateZ',step.activeRotateZ);
+                            slide.setAttribute('activeScale',step.activeScale);
+
+                            slideTransitions[index] = step;
+                        }
+
+                        return slideTransitions;
+                    }
+                };
+
+                return layout;
+            }
+        });
+    </script>
+</polymer-element>

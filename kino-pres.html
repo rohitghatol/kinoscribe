@@ -1,0 +1,403 @@
+<!--
+Copyright (c) 2014 Synerzip. All rights reserved.
+This code may only be used under the Apache 2.0 style license found at http://www.apache.org/licenses/LICENSE-2.0
+Code distributed by Synerzip as part of its showcase apps built on Polymer https://github.com/Synerzip/kinoscribe
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+
+<!--
+Element providing solution to creating impress.js like slideshow in browser
+
+##### Example
+
+    <kino-pres>
+        <kino-slide x="100" y="100" z="-100" rotateX="30" rotateY="30" rotateZ="0" scale=3">
+            <section>
+               Slide 1
+             </section>
+        </kino-slide>
+        <kino-slide x="200" y="200" z="-200" rotateX="60" rotateY="60" rotateZ="50" scale=5">
+             <section>
+               Slide 2
+             </section>
+        </kino-slide>
+        ....
+    </kino-pres>
+
+
+@element kino-pres
+@blurb Element providing solution to creating impress.js like slideshow in browser
+@status alpha
+@homepage http://github.com/Synerzip/kinoscribe
+-->
+<polymer-element name="kino-pres" attributes="currentSlide slides transition">
+
+<template>
+
+    <style>
+        :host {
+
+        }
+        #preso{
+            position: absolute;
+            left: 50%;
+            top: 50%;
+        }
+    </style>
+    <kino-transition-default id="defaultTransition"></kino-transition-default>
+    <article id="preso">
+        <section id="container">
+            <content select="kino-slide"></content>
+        </section>
+    </article>
+
+</template>
+<script src="style.js"></script>
+<script>
+
+    Polymer('kino-pres', {
+        /**
+         * Current slide being shown
+         *
+         * @attribute currentSlide
+         * @type num
+         * @defaultValue 1
+         */
+        currentSlide: 1,
+        /**
+         * Total number of slides
+         *
+         * @property slides
+         * @type num
+         */
+        slides: 0,
+        /**
+         * All the Transition slideTransitions for KinoScribe Presentation
+         *
+         *
+         *
+         */
+        slideTransitions: [],
+
+        /**
+         */
+        initialized:false,
+        /**
+         * Slide Transition
+         * @attribute transition
+         * @type string
+         */
+        transition:"kino-transition-default",
+        /**
+         *
+         */
+        config: {
+            width: 1024,
+            height: 768,
+            maxScale: 1,
+            minScale: 0,
+            perspective: 1000,
+            transitionDuration: 1000
+        },
+
+        transitionChanged:function(oldValue,newValue){
+            if(this.initialized){
+                this.render();
+            }
+        },
+        /**
+         *
+         */
+        attached: function () {
+
+            var self=this;
+            var css = new Style();
+            css.apply(document.body,{
+                overflow:"hidden",
+                height:"100%"
+            })
+            this.init();
+            this.render();
+        },
+
+        init:function(){
+            var self = this;
+            document.addEventListener("keydown", function (event) {
+                //On Left Arrow
+                if (37 === event.keyCode) {
+                    self.prev();
+                }
+                //On Right Arrow
+                else if (39 === event.keyCode || 32 === event.keyCode) {
+                    self.next();
+                }
+            }, true);
+            // touch handler to detect taps on the left and right side of the screen
+            // based on awesome work of @hakimel: https://github.com/hakimel/reveal.js
+            document.addEventListener("touchstart", function ( event ) {
+                if (event.touches.length === 1) {
+                    var x = event.touches[0].clientX,
+                            width = window.innerWidth * 0.3,
+                            result = null;
+
+                    if ( x < width ) {
+                        self.prev();
+                    } else if ( x > window.innerWidth - width ) {
+                        this.next();
+                    }
+
+                    if (result) {
+                        self.preventDefault();
+                    }
+                }
+            }, false);
+            // rescale presentation when window is resized
+            window.addEventListener("resize", function () {
+                // force going to active step again, to trigger rescaling
+                self.goto(self.currentSlide);
+            }, false);
+
+            window.addEventListener("hashchange", function () {
+                self.readSlideNumFromHash();
+            }, false);
+
+
+            self.readSlideNumFromHash();
+
+        },
+
+        render:function(){
+            var self=this;
+            var transitionElem=document.querySelector(this.transition)||this.$.defaultTransition;
+            transitionElem.addEventListener("layout-ready",function(event){
+                self.renderLayout(new event.detail.layout());
+            });
+            this.fire("layout-request",null,transitionElem);
+        },
+        renderLayout:function(layout){
+            var nodes = this.getSlides();
+            this.slides=nodes.length;
+            nodes[0].active = true;
+            this.slideTransitions=layout.calculateSlideTransitions(nodes);
+            this.goto(this.currentSlide);
+            var self=this;
+            setTimeout(function(){
+                self.initialized=true;
+            },2000);
+
+        },
+        currentSlideChanged: function (oldValue, newValue) {
+            var slides = this.getSlides();
+            var prevSlide = slides[oldValue-1];
+            var nextSlide = slides[newValue-1];
+
+            this.fire("slideChanged",newValue,this);
+            this.fire("enter",newValue,nextSlide);
+            this.fire("exit",oldValue,prevSlide);
+
+            this.goto(this.currentSlide);
+        },
+        next:function(){
+            this.currentSlide = this.currentSlide>=this.slideTransitions.length ? 1 : (this.currentSlide + 1);
+        },
+        prev:function(){
+            this.currentSlide = this.currentSlide <= 1 ? this.slideTransitions.length : (this.currentSlide - 1);
+        },
+
+        readSlideNumFromHash:function(){
+            var slideNum=window.location.hash.replace(/^#\/?/,"");
+            var newValue = toNumber(slideNum,this.currentSlide);
+            //If use gives wrong range, move to current slide
+            if(newValue>0 && newValue<=this.slides){
+                this.currentSlide=newValue;
+            }
+            else{
+                window.location.hash =   "#/" + this.currentSlide;
+            }
+        },
+        goto: function (currentSlide) {
+            window.scrollTo(0, 0);
+
+            this.modifyRoot(currentSlide);
+            this.modifyContainer(currentSlide);
+        },
+        modifyRoot:function(currentSlide){
+            var css = new Style();
+            var step = this.slideTransitions[this.currentSlide-1];
+
+
+            var root = this.$.preso;
+            var targetScale = inverse(step.activeScale) * this.windowScale(this.config);
+            var perspectiveValue = this.config.perspective / targetScale;
+            var scaleValue = targetScale;
+
+            var transformBuilder = new TransformBuilder();
+            var transform = transformBuilder
+                    .perspective(perspectiveValue)
+                    .scale(scaleValue)
+                    .transform;
+
+
+            var style={
+                position:"absolute",
+                transformationOrigin : "0% 0%",
+                transition:"all 1000ms ease-in-out 0ms",
+                top:"50%",
+                left:"50%",
+                transformStyle:"preserve-3d",
+                transform:transform
+            }
+            css.apply(root,style);
+        },
+        modifyContainer:function(currentSlide){
+            var css = new Style();
+            var step = this.slideTransitions[this.currentSlide-1];
+
+            var container = this.$.container;
+
+            var transformBuilder = new TransformBuilder();
+            var transform = transformBuilder
+                    .rotate3d(negate(step.activeRotateX),negate(step.activeRotateY),negate(step.activeRotateZ),true)
+                    .translate3d(negate(step.activeX),negate(step.activeY),negate(step.activeZ))
+                    .transform
+            var style={
+                position:"absolute",
+                transformationOrigin : "0% 0%",
+                transition:"all 1000ms ease-in-out 0ms",
+                transformStyle:"preserve-3d",
+                transform:transform
+            }
+            css.apply(container,style);
+
+        },
+
+        windowScale: function (config) {
+            var hScale = window.innerHeight / config.height,
+                    wScale = window.innerWidth / config.width,
+                    scale = hScale > wScale ? wScale : hScale;
+
+            if (config.maxScale && scale > config.maxScale) {
+                scale = config.maxScale;
+            }
+
+            if (config.minScale && scale < config.minScale) {
+                scale = config.minScale;
+            }
+
+            return scale;
+        },
+
+        getSlideCount:function(){
+            return this.$.container.children!=null?this.$.container.children[0].getDistributedNodes().length:0;
+        },
+        getSlides: function () {
+            return this.$.container.children!=null?this.$.container.children[0].getDistributedNodes():[];
+        },
+
+        getSlide:function(index){
+            return getSlides()[index];
+        }
+    });
+
+</script>
+</polymer-element>
+
+
+<polymer-element name="kino-transition-default" on-layout-request="{{onLayoutRequest}}">
+
+    <template>
+        <style>
+            :host{
+                display:none;
+            }
+        </style>
+    </template>
+
+    <script>
+        Polymer('kino-transition-default', {
+            onLayoutRequest:function(){
+                this.fire("layout-ready",{"layout":this.layoutProvider()});
+            },
+            layoutProvider:function(){
+                var layout = function(){
+                    this.calculateSlideTransitions=function(slides){
+
+                        var slideTransitions=[];
+
+                        for (var index = 0; index < slides.length; index++) {
+                            var slide = slides[index];
+                            var step = {
+                                x: 0, y: 0, z: 0,
+                                rotateX: 0, rotateY: 0, rotateZ: 0,
+                                scale: 1,
+                                activeX: 0, activeY: 0, activeZ: 0,
+                                activeRotateX: 0, activeRotateY: 0, activeRotateZ: 0,
+                                activeScale: 1
+                            };
+                            if (slide.attributes.x != null) {
+                                step.x = toNumber(slide.attributes.x.value);
+                            }
+                            if (slide.attributes.y != null) {
+                                step.y = toNumber(slide.attributes.y.value);
+                            }
+                            if (slide.attributes.z != null) {
+                                step.z = toNumber(slide.attributes.z.value);
+                            }
+                            if (slide.attributes.rotateZ != null) {
+                                step.rotateZ = toNumber(slide.attributes.rotateZ.value);
+                            }
+                            if (slide.attributes.rotateY != null) {
+                                step.rotateY = toNumber(slide.attributes.rotateY.value);
+                            }
+                            if (slide.attributes.rotateX != null) {
+                                step.rotateX = toNumber(slide.attributes.rotateX.value);
+                            }
+                            if (slide.attributes.scale != null) {
+                                step.scale = toNumber(slide.attributes.scale.value, 1);
+                            }
+                            step.activeX=step.x;
+                            step.activeY=step.y;
+                            step.activeZ=step.z;
+                            step.activeRotateX=step.rotateX;
+                            step.activeRotateY=step.rotateY;
+                            step.activeRotateZ=step.rotateZ;
+                            step.activeScale=step.scale;
+
+
+                            if (slide.attributes.activeX != null) {
+                                step.activeX = toNumber(slide.attributes.activeX.value);
+                            }
+                            if (slide.attributes.activeY != null) {
+                                step.activeY = toNumber(slide.attributes.activeY.value);
+                            }
+                            if (slide.attributes.activeZ != null) {
+                                step.activeZ = toNumber(slide.attributes.activeZ.value);
+                            }
+                            if (slide.attributes.activeRotateZ != null) {
+                                step.activeRotateZ = toNumber(slide.attributes.activeRotateZ.value);
+                            }
+                            if (slide.attributes.activeRotateY != null) {
+                                step.activeRotateY = toNumber(slide.attributes.activeRotateY.value);
+                            }
+                            if (slide.attributes.activeRotateX != null) {
+                                step.activeRotateX = toNumber(slide.attributes.activeRotateX.value);
+                            }
+                            if (slide.attributes.activeScale != null) {
+                                step.activeScale = toNumber(slide.attributes.activeScale.value, 1);
+                            }
+
+                            slideTransitions[index] = step;
+                        }
+
+                        return slideTransitions;
+                    }
+                };
+
+                return layout;
+            }
+        });
+    </script>
+</polymer-element>
+

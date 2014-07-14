@@ -1,0 +1,303 @@
+<!--
+Copyright (c) 2014 Synerzip. All rights reserved.
+This code may only be used under the Apache 2.0 style license found at http://www.apache.org/licenses/LICENSE-2.0
+Code distributed by Synerzip as part of its showcase apps built on Polymer https://github.com/Synerzip/kinoscribe
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+
+<!--
+Element providing solution to creating slides under kino-pres web component
+
+##### Example
+
+    <kino-pres>
+        <kino-slide x="100" y="100" z="-100" rotateX="30" rotateY="30" rotateZ="0" scale=3">
+            <section>
+               Slide 1
+             </section>
+        </kino-slide>
+        <kino-slide x="200" y="200" z="-200" rotateX="60" rotateY="60" rotateZ="50" scale=5">
+             <section>
+               Slide 2
+             </section>
+        </kino-slide>
+        ....
+    </kino-pres>
+
+
+@element kino-slide
+@blurb Element providing solution to creating slides under kino-pres element
+@status alpha
+@homepage http://github.com/Synerzip/kinoscribe
+-->
+
+<polymer-element name="kino-slide" attributes="x y z rotateX rotateY rotateZ scale active activeX activeY activeZ activeRotateX activeRotateY activeRotateZ activeScale">
+
+    <template>
+
+        <style>
+            :host {
+
+            }
+
+            #slide {
+                position: relative;
+
+            }
+
+            .active {
+                opacity: 1;
+                -webkit-transition: 200ms ease-in-out 100ms;
+
+            }
+
+            .inactive {
+                opacity: 0.2;
+
+                -webkit-transition: 2000ms ease-in-out 100ms;
+
+            }
+
+            ::content layout {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+
+        <section id="slide" class="{{active==true?'active':'inactive'}}">
+            <content></content>
+        </section>
+
+    </template>
+    <script src="style.js"></script>
+    <script>
+
+
+        Polymer('kino-slide', {
+
+
+            /**
+             * The `x` position of the slide on the 3D Presentation Canvas
+             *
+             * @attribute x
+             * @type num
+             * @default 0
+             */
+            x: 0,
+
+
+
+            /**
+             * The `y` position of the slide on the 3D Presentation Canvas
+             *
+             * @attribute y
+             * @type num
+             * @default 0
+             */
+            y: 0,
+
+
+
+            /**
+             * The `z` position of the slide on the 3D Presentation Canvas
+             *
+             * @attribute z
+             * @type num
+             * @default 0
+             */
+            z: 0,
+
+
+            /**
+             * The angle of rotation along 'x' axis of the slide on the 3D Presentation Canvas
+             *
+             * @attribute rotateX
+             * @type num
+             * @default 0
+             */
+            rotateX: 0,
+
+
+
+            /**
+             * The angle of rotation along 'y' axis of the slide on the 3D Presentation Canvas
+             *
+             * @attribute rotateY
+             * @type num
+             * @default 0
+             */
+            rotateY: 0,
+
+
+            /**
+             * The angle of rotation along 'z' axis of the slide on the 3D Presentation Canvas
+             *
+             * @attribute rotateZ
+             * @type num
+             * @default 0
+             */
+            rotateZ: 0,
+
+
+            /**
+             * The magnification scale of this slide
+             *
+             * @attribute scale
+             * @type num
+             * @default 1
+             */
+            scale: 1,
+
+
+            /**
+             * The `x` position of the slide when selected
+             *
+             * @attribute activeX
+             * @type num
+             * @default 0
+             */
+            activeX: null,
+
+            /**
+             * The `y` position of the slide when selected
+             *
+             * @attribute activeY
+             * @type num
+             * @default 0
+             */
+            activeY: null,
+
+            /**
+             * The `z` position of the slide when selected
+             *
+             * @attribute activeZ
+             * @type num
+             * @default 0
+             */
+            activeZ: null,
+
+            /**
+             * The angle of rotation along 'x' axis of the slide when selected
+             *
+             * @attribute activeRotateX
+             * @type num
+             * @default 0
+             */
+            activeRotateX: null,
+
+            /**
+             * The angle of rotation along 'y' axis of the slide when selected
+             *
+             * @attribute activeRotateY
+             * @type num
+             * @default 0
+             */
+            activeRotateY: null,
+
+
+            /**
+             * The angle of rotation along 'z' axis of the slide when selected
+             *
+             * @attribute activeRotateZ
+             * @type num
+             * @default 0
+             */
+            activeRotateZ: null,
+
+            /**
+             * The magnification scale when selected
+             *
+             * @attribute activeScale
+             * @type num
+             * @default 0
+             */
+            activeScale: null,
+
+            /**
+             * Indication of this slide being the Active/Current Slide being shown
+             *
+             * @attribute active
+             * @type bool
+             * @default false
+             */
+            active: false,
+            attributeChanged: function(attrName, oldValue, newValue) {
+                if(attrName!='active'){
+                    this.render();
+                }
+            },
+
+
+            domReady: function () {
+                var self=this;
+                this.init();
+                this.render();
+
+                this.addEventListener("enter",function(event){
+                    this.active=true;
+                    window.location.hash =   "#/" + toNumber(event.detail);
+                    self.renderActive();
+                });
+                this.addEventListener("exit",function(event){
+                    this.active=false;
+                    self.render();
+                });
+            },
+            init:function(){
+                this.activeX=this.activeX||this.x;
+                this.activeY=this.activeY||this.y;
+                this.activeZ=this.activeZ||this.z;
+
+                this.activeRotateX=this.activeRotateX||this.rotateX;
+                this.activeRotateY=this.activeRotateY||this.rotateY;
+                this.activeRotateZ=this.activeRotateZ||this.rotateZ;
+
+                this.activeScale = this.activeScale||this.scale;
+
+
+
+            },
+            render:function(){
+                var slide = this.$.slide;
+
+                var css = new Style();
+                var transformBuilder = new TransformBuilder();
+
+                var style={
+                    position:"absolute",
+                    transformStyle:"preserve-3d",
+                    transform:transformBuilder
+                            .translate("-50%","-50%")
+                            .translate3d(this.x,this.y,this.z)
+                            .rotate3d(this.rotateX,this.rotateY,this.rotateZ)
+                            .scale(this.scale)
+                            .transform
+                }
+                css.apply(slide,style);
+            },
+            renderActive:function(){
+                var slide = this.$.slide;
+
+                var css = new Style();
+                var transformBuilder = new TransformBuilder();
+
+                var style={
+                    position:"absolute",
+                    transformStyle:"preserve-3d",
+                    transform:transformBuilder
+                            .translate("-50%","-50%")
+                            .translate3d(this.activeX,this.activeY,this.activeZ)
+                            .rotate3d(this.activeRotateX,this.activeRotateY,this.activeRotateZ)
+                            .scale(this.activeScale)
+                            .transform
+                }
+                css.apply(slide,style);
+            }
+        });
+    </script>
+
+</polymer-element>
+
+

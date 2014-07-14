@@ -1,0 +1,116 @@
+<x-meta id="kino-pres" label="Presentation" isContainer group="KinoScribe">
+
+    <template>
+        <kino-pres currentSlide="1" transition="kino-transition-left-to-right" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0;"/>
+    </template>
+
+    <property name="currentSlide"
+              kind="number">
+    </property>
+
+    <property name="transition"
+              kind="select"
+              options="kino-transition-left-to-right,kino-transition-top-to-bottom,kino-transition-left-to-right-emphasis,kino-transition-top-to-bottom-emphasis,kino-transition-box,kino-transition-3d-spiral,kino-transition-file-cabinet">
+    </property>
+
+    <template id="imports">
+        <link rel="import" href="kino-pres.html">
+    </template>
+
+</x-meta>
+
+<x-meta id="kino-slide" label="Slide" isContainer group="KinoScribe">
+
+
+    <template>
+
+        <kino-slide x="0" y="0" z="0" rotateX="0" rotateY="0" rotateZ="0" scale="1"
+                activeX="0" activeY="0" activeZ="0" activeRotateX="0" activeRotateY="0" activeRotateZ="0" activeScale="1">
+                <section style="width:800px;height:600px;border:1px solid blue;border-radius: 20px">
+                    <h1>Slide</h1>
+                </section>
+        </kino-slide>
+    </template>
+
+    <template id="imports">
+        <link rel="import" href="kino-slide.html">
+    </template>
+
+</x-meta>
+
+<x-meta id="kino-transition-left-to-right" label="Left to Right" group="KinoScribe-Transitions">
+    <template>
+        <kino-transition-left-to-right></kino-transition-left-to-right>
+    </template>
+
+    <template id="imports">
+        <link rel="import" href="kino-transition-left-to-right.html">
+    </template>
+
+</x-meta>
+
+<x-meta id="kino-transition-left-to-right-emphasis" label="Emphasis Left to Right" group="KinoScribe-Transitions">
+    <template>
+        <kino-transition-left-to-right-emphasis></kino-transition-left-to-right-emphasis>
+    </template>
+
+    <template id="imports">
+        <link rel="import" href="kino-transition-left-to-right-emphasis.html">
+    </template>
+
+</x-meta>
+
+<x-meta id="kino-transition-top-to-bottom" label="Top to Bottom" group="KinoScribe-Transitions">
+    <template>
+        <kino-transition-top-to-bottom></kino-transition-top-to-bottom>
+    </template>
+
+    <template id="imports">
+        <link rel="import" href="kino-transition-top-to-bottom.html">
+    </template>
+
+</x-meta>
+
+
+<x-meta id="kino-transition-top-to-bottom-emphasis" label="Emphasis Top to Bottom" group="KinoScribe-Transitions">
+    <template>
+        <kino-transition-top-to-bottom-emphasis></kino-transition-top-to-bottom-emphasis>
+    </template>
+
+    <template id="imports">
+        <link rel="import" href="kino-transition-top-to-bottom-emphasis.html">
+    </template>
+
+</x-meta>
+<x-meta id="kino-transition-file-cabinet" label="File Cabinet" group="KinoScribe-Transitions">
+    <template>
+        <kino-transition-file-cabinet></kino-transition-file-cabinet>>
+    </template>
+
+    <template id="imports">
+        <link rel="import" href="kino-transition-file-cabinet.html">
+    </template>
+
+</x-meta>
+
+<x-meta id="kino-transition-box" label="3D Box" group="KinoScribe-Transitions">
+    <template>
+        <kino-transition-box></kino-transition-box>
+    </template>
+
+    <template id="imports">
+        <link rel="import" href="kino-transition-box.html">
+    </template>
+
+</x-meta>
+
+<x-meta id="kino-transition-3d-spiral" label="3D Spiral" group="KinoScribe-Transitions">
+    <template>
+        <kino-transition-3d-spiral></kino-transition-3d-spiral>
+    </template>
+
+    <template id="imports">
+        <link rel="import" href="kino-transition-3d-spiral.html">
+    </template>
+
+</x-meta>

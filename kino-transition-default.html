@@ -1,0 +1,96 @@
+<polymer-element name="kino-transition-default" on-layout-request="{{onLayoutRequest}}">
+
+    <template>
+        <style>
+            :host{
+                display:none;
+            }
+        </style>
+    </template>
+
+    <script>
+        Polymer('kino-transition-default', {
+            onLayoutRequest:function(){
+                this.fire("layout-ready",{"layout":this.layoutProvider()});
+            },
+            layoutProvider:function(){
+                var layout = function(){
+                    this.calculateSlideTransitions=function(slides){
+
+                        var slideTransitions=[];
+
+                        for (var index = 0; index < slides.length; index++) {
+                            var slide = slides[index];
+                            var step = {
+                                x: 0, y: 0, z: 0,
+                                rotateX: 0, rotateY: 0, rotateZ: 0,
+                                scale: 1,
+                                activeX: 0, activeY: 0, activeZ: 0,
+                                activeRotateX: 0, activeRotateY: 0, activeRotateZ: 0,
+                                activeScale: 1
+                            };
+                            if (slide.attributes.x != null) {
+                                step.x = toNumber(slide.attributes.x.value);
+                            }
+                            if (slide.attributes.y != null) {
+                                step.y = toNumber(slide.attributes.y.value);
+                            }
+                            if (slide.attributes.z != null) {
+                                step.z = toNumber(slide.attributes.z.value);
+                            }
+                            if (slide.attributes.rotateZ != null) {
+                                step.rotateZ = toNumber(slide.attributes.rotateZ.value);
+                            }
+                            if (slide.attributes.rotateY != null) {
+                                step.rotateY = toNumber(slide.attributes.rotateY.value);
+                            }
+                            if (slide.attributes.rotateX != null) {
+                                step.rotateX = toNumber(slide.attributes.rotateX.value);
+                            }
+                            if (slide.attributes.scale != null) {
+                                step.scale = toNumber(slide.attributes.scale.value, 1);
+                            }
+                            step.activeX=step.x;
+                            step.activeY=step.y;
+                            step.activeZ=step.z;
+                            step.activeRotateX=step.rotateX;
+                            step.activeRotateY=step.rotateY;
+                            step.activeRotateZ=step.rotateZ;
+                            step.activeScale=step.scale;
+
+
+                            if (slide.attributes.activeX != null) {
+                                step.activeX = toNumber(slide.attributes.activeX.value);
+                            }
+                            if (slide.attributes.activeY != null) {
+                                step.activeY = toNumber(slide.attributes.activeY.value);
+                            }
+                            if (slide.attributes.activeZ != null) {
+                                step.activeZ = toNumber(slide.attributes.activeZ.value);
+                            }
+                            if (slide.attributes.activeRotateZ != null) {
+                                step.activeRotateZ = toNumber(slide.attributes.activeRotateZ.value);
+                            }
+                            if (slide.attributes.activeRotateY != null) {
+                                step.activeRotateY = toNumber(slide.attributes.activeRotateY.value);
+                            }
+                            if (slide.attributes.activeRotateX != null) {
+                                step.activeRotateX = toNumber(slide.attributes.activeRotateX.value);
+                            }
+                            if (slide.attributes.activeScale != null) {
+                                step.activeScale = toNumber(slide.attributes.activeScale.value, 1);
+                            }
+
+                            slideTransitions[index] = step;
+                        }
+
+                        return slideTransitions;
+                    }
+                };
+
+                return layout;
+            }
+        });
+    </script>
+</polymer-element>
+

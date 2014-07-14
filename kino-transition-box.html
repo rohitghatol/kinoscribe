@@ -1,0 +1,129 @@
+<polymer-element name="kino-transition-box" extends="kino-transition-default">
+
+    <template>
+        <style>
+            :host{
+                display:none;
+            }
+        </style>
+    </template>
+
+    <script>
+        Polymer('kino-transition-box', {
+
+            layoutProvider:function(){
+                var dimension = function(slide){
+                    var dim = {
+                        width:0,
+                        height:0
+                    };
+                    for(var index =0;index<slide.children.length;index++){
+                        dim.width+=slide.children[index].offsetWidth;
+                        dim.height+=slide.children[index].offsetHeight;
+                    }
+                    return dim;
+                }
+                var layout = function(){
+
+                    this.calculateSlideTransitions=function(slides){
+
+                        var slideTransitions=[];
+                        var lastX=0
+                        var lastY=0;
+                        var lastZ=0;
+                        var lastRotateX=0;
+                        var lastRotateY=0;
+                        var lastRotateZ=0;
+
+                        var funcX=function(index,dim){
+                            var face = index%4;
+                            if(face==0){
+                                return 0;
+                            }
+                            if(face==1){
+                                return dim.width/2;
+                            }
+                            if(face==2){
+                                return 1 ;
+                            }
+                            if(face==3){
+                                return -1 * dim.width/2;
+                            }
+                            return 0;
+                        }
+
+                        var funcZ=function(index,dim){
+                            var face = index%4;
+                            if(face==0){
+                                return dim.width/2;
+                            }
+                            if(face==1){
+                                return 0;
+                            }
+                            if(face==2){
+                                return -1 * dim.width/2;
+                            }
+                            if(face==3){
+                                return 0 ;
+                            }
+                            return 0;
+                        }
+
+                        var funcRotateY=function(index,dim){
+                            return index*90;
+                        }
+
+                        for (var index = 0; index < slides.length; index++) {
+
+                            var slide = slides[index];
+                            var dim = dimension(slide);
+
+
+                            var step = {
+                                x:funcX(index,dim),
+                                y: 0,
+                                z: funcZ(index,dim),
+                                rotateX: 0,
+                                rotateY: funcRotateY(index,dim),
+                                rotateZ: 0,
+                                scale: 1,
+                                activeX:funcX(index,dim),
+                                activeY: 0,
+                                activeZ: funcZ(index,dim),
+                                activeRotateX: 0,
+                                activeRotateY: funcRotateY(index,dim),
+                                activeRotateZ: 0,
+                                activeScale: 1.1
+
+                            };
+                            slide.setAttribute('x',step.x);
+                            slide.setAttribute('y',step.y);
+                            slide.setAttribute('z',step.z);
+                            slide.setAttribute('rotateX',step.rotateX);
+                            slide.setAttribute('rotateY',step.rotateY);
+                            slide.setAttribute('rotateZ',step.rotateZ);
+                            slide.setAttribute('scale',step.scale);
+
+                            slide.setAttribute('activeX',step.activeX);
+                            slide.setAttribute('activeY',step.activeY);
+                            slide.setAttribute('activeZ',step.activeZ);
+                            slide.setAttribute('activeRotateX',step.activeRotateX);
+                            slide.setAttribute('activeRotateY',step.activeRotateY);
+                            slide.setAttribute('activeRotateZ',step.activeRotateZ);
+                            slide.setAttribute('activeScale',step.activeScale);
+
+
+                            slideTransitions[index] = step;
+
+
+                        }
+
+                        return slideTransitions;
+                    }
+                };
+
+                return layout;
+            }
+        });
+    </script>
+</polymer-element>
