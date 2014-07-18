@@ -1,0 +1,75 @@
+<polymer-element name="kino-pres-controls">
+
+    <template>
+        <style>
+            :host{
+
+            }
+            #left{
+                position:absolute;
+                left:0px;
+                top:50%;
+                width:60px;
+                padding:10px;
+                z-index: 50000;
+
+            }
+            #right{
+                position:absolute;
+                right:0px;
+                top:50%;
+
+                width:60px;
+                padding:10px;
+                z-index: 50000;
+            }
+
+        </style>
+        <div id="right" on-tap="{{next}}">
+            <svg>
+                <polygon points="0 0 60 40 0 80" fill="red"/>
+            </svg>
+        </div>
+        <div id="left" on-tap="{{prev}}">
+            <svg>
+                <polygon points="60 0 0 40 60 80" fill="red"/>
+            </svg>
+        </div>
+    </template>
+
+    <script>
+
+        Polymer('kino-pres-controls', {
+            /**
+             * ID of Kino-Pres Presentation to control
+             *
+             * @attribute red
+             * @type string
+             * @defaultValue ""
+             */
+            ref: "",
+            kinoPresElem:null,
+            domReady:function(){
+              this.kinoPresElem = document.querySelector("kino-pres");
+            },
+            next:function(){
+                if(this.kinoPresElem!=null){
+                    var currentSlide = Number(this.kinoPresElem.currentSlide);
+                    var slides = Number(this.kinoPresElem.slides);
+                    var newSlideNum = currentSlide>=slides ? 1 : (currentSlide + 1);
+                    this.kinoPresElem.currentSlide = newSlideNum;
+                }
+            },
+            prev:function(){
+                if(this.kinoPresElem!=null){
+
+                    var currentSlide = Number(this.kinoPresElem.currentSlide);
+                    var slides = Number(this.kinoPresElem.slides);
+                    console.log(currentSlide);
+                    var newSlideNum = currentSlide <= 1 ? slides : (currentSlide - 1);
+                    this.kinoPresElem.currentSlide = newSlideNum;
+                }
+            }
+        });
+    </script>
+</polymer-element>
