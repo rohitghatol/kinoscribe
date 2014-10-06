@@ -1,13 +1,26 @@
 KinoScribe - 3D Presentations
 ==========
-KinoScribe is Web Components for doing 3D Presentations in HTML5
+Introduction
+============
+KinoScribe is a 3D Presentation framework built using Polymer.js (Google's Web Component's Library). Using KinoScribe you can create 3D Presentations in which you can layout your side in 3D using 
+ * Custom Layout - You define all 3D Coordinates, Rotations etc
+ * Preset Layouts - Where you use one of the Preset Layouts like "Left to Right", "Top to Bottom", "Box", "Spiral", "Album"
 
-Demo
+
+
+Video Demo
 ======
-__3D Presentations using KinoScribe__
-![alt text](http://rohitghatol.github.io/kinoscribe/images/kino-scribe.png "KinoScribe")
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=l4Dauw3oJ1o
+" target="_blank"><img src="http://img.youtube.com/vi/l4Dauw3oJ1o/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="480" height="360" border="10" /></a>
 
- __Live Demo__ - http://rohitghatol.github.io/kinoscribe
+Home Page
+=========
+Visit - http://www.kinoscribe.com for live demo
+
+Code Examples
+=============
+Visit - http://www.kinoscribe.com for live demo
 
 Browser Compatibility
 =========
