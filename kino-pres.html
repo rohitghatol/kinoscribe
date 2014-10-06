@@ -44,6 +44,7 @@ Element providing solution to creating impress.js like slideshow in browser
             position: absolute;
             left: 50%;
             top: 50%;
+            width:0px;
         }
     </style>
     <kino-transition-default id="defaultTransition"></kino-transition-default>
@@ -81,9 +82,7 @@ Element providing solution to creating impress.js like slideshow in browser
          */
         slideTransitions: [],
 
-        /**
-         */
-        initialized:false,
+       
         /**
          * Slide Transition
          * @attribute transition
@@ -102,11 +101,7 @@ Element providing solution to creating impress.js like slideshow in browser
             transitionDuration: 1000
         },
 
-        transitionChanged:function(oldValue,newValue){
-            if(this.initialized){
-                this.render();
-            }
-        },
+        
         /**
          *
          */
@@ -182,10 +177,7 @@ Element providing solution to creating impress.js like slideshow in browser
             nodes[0].active = true;
             this.slideTransitions=layout.calculateSlideTransitions(nodes);
             this.goto(this.currentSlide);
-            var self=this;
-            setTimeout(function(){
-                self.initialized=true;
-            },2000);
+            
 
         },
         currentSlideChanged: function (oldValue, newValue) {
