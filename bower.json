@@ -6,7 +6,8 @@
     "presentation",
     "polymer",
     "webcomponent",
-    "synerzip"
+    "synerzip",
+    "web-components"
   ],
   "main": "kinoscribe.html",
   "dependencies": {
